@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 
 
-public class Day_1 : MonoBehaviour
+public class Day_01 : MonoBehaviour
 {
     
     private void Start()
@@ -18,7 +18,7 @@ public class Day_1 : MonoBehaviour
 
     private void Part_1()
     {
-        int[] allRows = GetInputData();
+        int[] allRows = FileManagement.GetInputData("Day_01", "input.txt");
 
 
         //Actual problem: "count the number of times a depth measurement increases from the previous measurement"
@@ -43,7 +43,7 @@ public class Day_1 : MonoBehaviour
 
     private void Part_2()
     {
-        int[] allRows = GetInputData();
+        int[] allRows = FileManagement.GetInputData("Day_01", "input.txt");
 
 
         //Similar to first problem, but use the sum of 3 measurements
@@ -76,22 +76,4 @@ public class Day_1 : MonoBehaviour
 
         Debug.Log($"Number of increases: { numberOfIncreases }");
     }
-
-
-
-    private int[] GetInputData()
-    {
-        //Read the input
-        //File should be in Assets/StreamingAssets
-        //https://stackoverflow.com/questions/67744910/importing-each-line-from-text-file-from-resources-in-unity-to-list-in-c-sharp
-        string[] allRowsString = File.ReadAllLines(Path.Combine(Application.streamingAssetsPath, "Day_1/input.txt"));
-
-        //Convert from string to int
-        int[] allRows = Array.ConvertAll(allRowsString, int.Parse);
-
-        //Debug.Log(allRows.Length);
-
-        return allRows;
-    }
-
 }
