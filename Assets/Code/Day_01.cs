@@ -18,7 +18,10 @@ public class Day_01 : MonoBehaviour
 
     private void Part_1()
     {
-        int[] allRows = FileManagement.GetInputData("Day_01", "input.txt");
+        string[] allRowsString = FileManagement.GetInputData("Day_01", "input.txt");
+
+        //Convert from string to int
+        int[] allRows = Array.ConvertAll(allRowsString, int.Parse);
 
 
         //Actual problem: "count the number of times a depth measurement increases from the previous measurement"
@@ -43,7 +46,10 @@ public class Day_01 : MonoBehaviour
 
     private void Part_2()
     {
-        int[] allRows = FileManagement.GetInputData("Day_01", "input.txt");
+        string[] allRowsString = FileManagement.GetInputData("Day_01", "input.txt");
+
+        //Convert from string to int
+        int[] allRows = Array.ConvertAll(allRowsString, int.Parse);
 
 
         //Similar to first problem, but use the sum of 3 measurements
