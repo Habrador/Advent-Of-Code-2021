@@ -8,11 +8,123 @@ public class Day_04 : MonoBehaviour
     
     private void Start()
     {
-        Part_1();
+        //Part_1();
+        Part_2();
     }
 
 
 
+    //The idea here is to figure out which board will win last
+    private void Part_2()
+    {
+        //
+        // Prepare the data
+        //
+
+        string[] allData = FileManagement.GetInputData("Day_04", "input.txt");
+
+        //Debug.Log(allData[0]);
+        //Debug.Log(allData[1]);
+        //Debug.Log(allData[2]);
+
+        //The first row is the random numbers being drawn and they are comma separated
+        string[] bingoBallsStrings = allData[0].Split(',');
+
+        int[] bingoBalls = Array.ConvertAll(bingoBallsStrings, int.Parse);
+
+        //Debug.Log($"Number of balls: {bingoBalls.Length}");
+        //Debug.Log(bingoBalls[0]);
+        //Debug.Log(bingoBalls[bingoBalls.Length - 1]);
+
+        List<int[,]> allBoards = GetBingoBoards(allData);
+
+        //We also need an array that keep tracks of how the bingo game is going for each board
+        List<bool[,]> boardProgress = new List<bool[,]>();
+
+        for (int i = 0; i < allBoards.Count; i++)
+        {
+            bool[,] progress = new bool[5, 5];
+
+            boardProgress.Add(progress);
+        }
+
+
+
+        //
+        // Play the game
+        //
+
+        int winningBoardIndex = -1;
+        int winningBingoBall = -1;
+
+        int lastWinningBoardIndex = -1;
+
+        //To keep track of which board wins last
+        bool[] hasBoardWon = new bool[allBoards.Count];
+
+        //Debug.Log(hasBoardWon.Length);
+
+        for (int i = 0; i < bingoBalls.Length; i++)
+        {
+            int bingoBall = bingoBalls[i];
+
+            //Mark all numbers that matches thw bingo ball number
+            MarkBoards(allBoards, boardProgress, bingoBall, hasBoardWon);
+
+            //Check if a board has been winning
+
+            //Multiple boards can win, so we have to check them all (might be a better way to do this)
+            for (int boardIndex = 0; boardIndex < allBoards.Count; boardIndex++)
+            {
+                winningBoardIndex = CheckWinningBoard(boardProgress, hasBoardWon);
+
+                if (winningBoardIndex != -1)
+                {
+                    Debug.Log($"The winning board is: {winningBoardIndex}");
+
+                    winningBingoBall = bingoBall;
+
+                    //Remove this board
+                    hasBoardWon[winningBoardIndex] = true;
+
+                    lastWinningBoardIndex = winningBoardIndex;
+                }
+            }
+
+            //winningBoardIndex = -1;
+        }
+
+        Debug.Log($"The last winning board is: {lastWinningBoardIndex}");
+        Debug.Log($"The last winning ball is: {winningBingoBall}");
+
+
+        //To calculate the final number you add all the unmarked numbers of the winning board and multiply them with the last number drawn
+        int[,] winningBoard = allBoards[lastWinningBoardIndex];
+
+        int sum = 0;
+
+        for (int row = 0; row < 5; row++)
+        {
+            for (int column = 0; column < 5; column++)
+            {
+                if (!boardProgress[lastWinningBoardIndex][row, column])
+                {
+                    sum += winningBoard[row, column];
+
+                    Debug.Log(sum);
+                }
+            }
+        }
+
+        int finalScore = sum * winningBingoBall;
+
+        Debug.Log($"Final score: {finalScore}");
+    }
+
+
+
+    /*
+    //Part 2 screws up some of this code
     private void Part_1()
     {
         //
@@ -96,16 +208,22 @@ public class Day_04 : MonoBehaviour
 
         Debug.Log($"Final score: {finalScore}");
     }
+    */
 
 
     //Only rows and columns can win - no diagonals!
     //Returns -1 if no board has been winning, otherwise the index (only one board can win???)
-    private int CheckWinningBoard(List<bool[,]> boardProgress)
+    private int CheckWinningBoard(List<bool[,]> boardProgress, bool[] hasBoardWon)
     {
         int winningBoardIndex = -1;
 
         for (int boardIndex = 0; boardIndex < boardProgress.Count; boardIndex++)
         {
+            if (hasBoardWon[boardIndex])
+            {
+                continue;
+            }
+
             bool[,] thisBoard = boardProgress[boardIndex];
 
             //Check rows
@@ -154,10 +272,15 @@ public class Day_04 : MonoBehaviour
 
 
 
-    private void MarkBoards(List<int[,]> allBoards, List<bool[,]> boardProgress, int bingoBallNumber)
+    private void MarkBoards(List<int[,]> allBoards, List<bool[,]> boardProgress, int bingoBallNumber, bool[] hasBoardWon)
     {
         for (int boardIndex = 0; boardIndex < allBoards.Count; boardIndex++)
         {
+            if (hasBoardWon[boardIndex])
+            {
+                continue;
+            }
+        
             int[,] thisBoard = allBoards[boardIndex];
 
             for (int row = 0; row < 5; row++)
