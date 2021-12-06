@@ -16,6 +16,108 @@ public class Day_05 : MonoBehaviour
     private void Part_1()
     {
         List<LineSegment> lineSegments = GetData();
+
+        //Find map max size = max x and y values (starts at 0,0)
+        Vector2Int mapSize = GetMapSize(lineSegments);
+
+        //Add 1 to map size or all numbers wont fit in the array because 0 is included in the list of coordinates
+        int[,] map = new int[mapSize.x + 1, mapSize.y + 1];
+
+        //Debug.Log(map[0, 0]);
+
+        //Plot the horizontal and vertical lines, then count how many overlaps
+        foreach (LineSegment line in lineSegments)
+        {
+            Vector2Int p1 = line.p1;
+            Vector2Int p2 = line.p2;
+
+            //x is fixed
+            if (p1.x == p2.x)
+            {
+                //Swap if line is reversed to make an easier for loop
+                if (p2.y < p1.y)
+                {
+                    int tmp = p1.y;
+                    p1.y = p2.y;
+                    p2.y = tmp;
+                }
+
+                //Dont forget <= or we will not count the end point
+                for (int y = p1.y; y <= p2.y; y++)
+                {                
+                    map[p1.x, y] += 1;
+                }
+            }
+            //y is fixed
+            else if (p1.y == p2.y)
+            {
+                //Swap if line is reversed to make an easier for loop
+                if (p2.x < p1.x)
+                {
+                    int tmp = p1.x;
+                    p1.x = p2.x;
+                    p2.x = tmp;
+                }
+
+                for (int x = p1.x; x <= p2.x; x++)
+                {
+                    map[x, p1.y] += 1;
+                }
+            }
+        }
+
+
+        //Count number of overlapping lines (map number is > 1)
+        int overlappingLines = 0;
+
+        for (int x = 0; x < map.GetLength(0); x++)
+        {
+            for (int y = 0; y < map.GetLength(1); y++)
+            {
+                if (map[x, y] > 1)
+                {
+                    overlappingLines += 1;
+                }
+            }
+        }
+
+        //Should be 7085
+        Debug.Log($"Number of overlapping lines: {overlappingLines}");
+    }
+
+
+
+    private Vector2Int GetMapSize(List<LineSegment> lineSegments)
+    {
+        int maxX = -Int32.MaxValue;
+        int maxY = -Int32.MaxValue;
+
+        foreach (LineSegment line in lineSegments)
+        {
+            Vector2Int p1 = line.p1;
+            Vector2Int p2 = line.p2;
+
+            if (p1.x > maxX)
+            {
+                maxX = p1.x;
+            }
+            if (p2.x > maxX)
+            {
+                maxX = p2.x;
+            }
+            if (p1.y > maxY)
+            {
+                maxY = p1.y;
+            }
+            if (p2.y > maxY)
+            {
+                maxY = p2.y;
+            }
+        }
+
+        //Debug.Log($"Max x: {maxX}, Max y: {maxY}");
+
+        return new Vector2Int(maxX, maxY);
     }
 
 
@@ -70,8 +172,8 @@ public class Day_05 : MonoBehaviour
 
     public struct LineSegment
     {
-        Vector2Int p1;
-        Vector2Int p2;
+        public Vector2Int p1;
+        public Vector2Int p2;
 
         public LineSegment(Vector2Int start, Vector2Int end)
         {
