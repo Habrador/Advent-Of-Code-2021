@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Day_06 : MonoBehaviour
 {
-    private static Int64 totalFishes;
+    private static long totalFishes;
 
 
 
@@ -79,12 +79,14 @@ public class Day_06 : MonoBehaviour
 
         //One fishes generates a total of 1,911,854,036 fishes, so 300 fishes should generate 573,556,210,800
         //Max size of int32 is 2,147,483,647
-        //Max Size of int64 is 9,223,372,036,854,775,807
+        //Max Size of int64 (long) is 9,223,372,036,854,775,807
 
 
 
         //This one is static
         totalFishes = fishAges.Count;
+
+        //We dont have to simulate ALL fishes - fishes that start with for example a 1 is only needed to simulate once - and then we just reuse the result. FailFish
 
         //for (int i = 0; i < fishAges.Count; i++)
         //{
@@ -108,12 +110,12 @@ public class Day_06 : MonoBehaviour
 
             //Save results in a text file so we dont have to resimulate everything because of large numbers
 
-            Debug.Log($"Finished fish {i + 1} of {fishAges.Count} fishes");
+            Debug.Log($"Finished fish {i + 1} of {fishAges.Count} fishes. Current count is: {totalFishes}");
 
             yield return null;
         }
 
-        Debug.Log($"Number of fishes: {totalFishes}");
+        Debug.Log($"Number of fishes after 256 days: {totalFishes}");
     }
 
 
