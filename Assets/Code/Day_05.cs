@@ -25,6 +25,8 @@ public class Day_05 : MonoBehaviour
 
         //Debug.Log(map[0, 0]);
 
+        int diagonalLines = 0;
+
         //Plot the horizontal and vertical lines, then count how many overlaps
         foreach (LineSegment line in lineSegments)
         {
@@ -64,7 +66,51 @@ public class Day_05 : MonoBehaviour
                     map[x, p1.y] += 1;
                 }
             }
+            //
+            // Part 2: diagonal lines (45 degrees only)
+            //
+            else
+            {
+                diagonalLines += 1;
+
+                int y = p1.y;
+
+                if (p2.x < p1.x)
+                {
+                    for (int x = p1.x; x >= p2.x; x--)
+                    {
+                        map[x, y] += 1;
+
+                        if (p1.y > p2.y)
+                        {
+                            y -= 1;
+                        }
+                        else
+                        {
+                            y += 1;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int x = p1.x; x <= p2.x; x++)
+                    {
+                        map[x, y] += 1;
+
+                        if (p1.y > p2.y)
+                        {
+                            y -= 1;
+                        }
+                        else
+                        {
+                            y += 1;
+                        }
+                    }
+                }
+            }
         }
+
+        Debug.Log($"Diagional lines: {diagonalLines}");
 
 
         //Count number of overlapping lines (map number is > 1)
@@ -81,7 +127,8 @@ public class Day_05 : MonoBehaviour
             }
         }
 
-        //Should be 7085
+        //Should be 7085 for Part 1
+        //Should be 20271 for Part 2
         Debug.Log($"Number of overlapping lines: {overlappingLines}");
     }
 
