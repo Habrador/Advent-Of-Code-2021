@@ -84,38 +84,86 @@ public class Day_06 : MonoBehaviour
 
 
         //This one is static
-        totalFishes = fishAges.Count;
+        //totalFishes = fishAges.Count;
 
         //We dont have to simulate ALL fishes - fishes that start with for example a 1 is only needed to simulate once - and then we just reuse the result. FailFish
 
-        //for (int i = 0; i < fishAges.Count; i++)
-        //{
-        //    SimulateFish(fishAges[i], 0, 256);
+        //Find frequency of days and which days are present (which is 1,2,3,4,5)
+        List<int> days = new List<int>();
 
-        //    //Save results in a text file so we dont have to resimulate everything because of large numbers
-        //}
-
-        StartCoroutine(FishSim(fishAges));
-
-        //Debug.Log($"Number of fishes: {totalFishes}");
-    }
-
-
-    
-    private IEnumerator FishSim(List<int> fishAges)
-    {
         for (int i = 0; i < fishAges.Count; i++)
         {
-            SimulateFish(fishAges[i], 0, 256);
+            if (!days.Contains(fishAges[i]))
+            {
+                days.Add(fishAges[i]);
 
-            //Save results in a text file so we dont have to resimulate everything because of large numbers
-
-            Debug.Log($"Finished fish {i + 1} of {fishAges.Count} fishes. Current count is: {totalFishes}");
-
-            yield return null;
+                //Debug.Log(fishAges[i]);
+            }
         }
 
-        Debug.Log($"Number of fishes after 256 days: {totalFishes}");
+
+        int[] dayFrequency = new int[days.Count];
+
+        for (int i = 0; i < fishAges.Count; i++)
+        {
+            int thisDay = fishAges[i];
+
+            //-1 because days are 1,2,3,4,5 and array starts at 0
+            dayFrequency[thisDay - 1] += 1;
+        }
+
+        //for (int i = 0; i < dayFrequency.Length; i++)
+        //{
+        //    Debug.Log(dayFrequency[i]);
+        //}
+
+        //Find out how many fishes each day is going to generate
+        int totalSimDays = 256;
+
+        //1
+        SimulateFish(1, 0, totalSimDays);
+
+        long totalFishes_1 = totalFishes + 1;
+
+        totalFishes = 0;
+
+        //2
+        SimulateFish(2, 0, totalSimDays);
+
+        long totalFishes_2 = totalFishes + 1;
+
+        totalFishes = 0;
+
+        //3
+        SimulateFish(3, 0, totalSimDays);
+
+        long totalFishes_3 = totalFishes + 1;
+
+        totalFishes = 0;
+
+        //4
+        SimulateFish(4, 0, totalSimDays);
+
+        long totalFishes_4 = totalFishes + 1;
+
+        totalFishes = 0;
+
+        //5
+        SimulateFish(5, 0, totalSimDays);
+
+        long totalFishes_5 = totalFishes + 1;
+
+        totalFishes = 0;
+
+
+        //Now we can calculate the total amount of fishes
+        totalFishes += totalFishes_1 * dayFrequency[0];
+        totalFishes += totalFishes_2 * dayFrequency[1];
+        totalFishes += totalFishes_3 * dayFrequency[2];
+        totalFishes += totalFishes_4 * dayFrequency[3];
+        totalFishes += totalFishes_5 * dayFrequency[4];
+
+        Debug.Log($"Number of fishes: {totalFishes}");
     }
 
 
