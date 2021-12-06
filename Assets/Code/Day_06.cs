@@ -5,7 +5,10 @@ using UnityEngine;
 
 public class Day_06 : MonoBehaviour
 {
-    
+    private static Int64 totalFishes;
+
+
+
     private void Start()
     {
         //Part_1();
@@ -72,51 +75,70 @@ public class Day_06 : MonoBehaviour
 
         //Simulate fish-by-fish
 
-        int totalFishes = 0;
+        //Use an recursive algorithm so we don't have to bother with list sizes running out of memory
 
+        //One fishes generates a total of 1,911,854,036 fishes, so 300 fishes should generate 573,556,210,800
+        //Max size of int32 is 2,147,483,647
+        //Max Size of int64 is 9,223,372,036,854,775,807
+
+
+
+        //This one is static
+        totalFishes = fishAges.Count;
+
+        //for (int i = 0; i < fishAges.Count; i++)
+        //{
+        //    SimulateFish(fishAges[i], 0, 256);
+
+        //    //Save results in a text file so we dont have to resimulate everything because of large numbers
+        //}
+
+        StartCoroutine(FishSim(fishAges));
+
+        //Debug.Log($"Number of fishes: {totalFishes}");
+    }
+
+
+    
+    private IEnumerator FishSim(List<int> fishAges)
+    {
         for (int i = 0; i < fishAges.Count; i++)
         {
-            List<int> fishAges_SubList = new List<int>();
+            SimulateFish(fishAges[i], 0, 256);
 
-            fishAges_SubList.Add(fishAges[i]);
+            //Save results in a text file so we dont have to resimulate everything because of large numbers
 
-            for (int day = 0; day < 100; day++)
-            {
-                List<int> newFishes = new List<int>();
+            Debug.Log($"Finished fish {i + 1} of {fishAges.Count} fishes");
 
-                for (int j = 0; j < fishAges_SubList.Count; j++)
-                {
-                    int fishAge = fishAges_SubList[j];
-
-                    fishAge -= 1;
-
-                    //Fish gets a baby
-                    if (fishAge < 0)
-                    {
-                        fishAge = 6;
-
-                        newFishes.Add(8);
-                    }
-
-                    fishAges_SubList[j] = fishAge;
-                }
-
-                //Add new fishes
-                fishAges_SubList.AddRange(newFishes);
-
-                GC.Collect();
-            }
-
-
-            totalFishes += fishAges_SubList.Count;
-
-            GC.Collect();
-
-            Debug.Log($"Finished processing fish {i + 1} of {fishAges.Count}");
+            yield return null;
         }
 
-
         Debug.Log($"Number of fishes: {totalFishes}");
+    }
+
+
+
+    private void SimulateFish(int fishAge, int days, int maxDays)
+    {
+        if (days >= maxDays)
+        {
+            return;
+        }
+    
+        for (int day = days; day < maxDays; day++)
+        {
+            fishAge -= 1;
+
+            //Fish gets a baby
+            if (fishAge < 0)
+            {
+                fishAge = 6;
+
+                SimulateFish(8, day + 1, maxDays);
+
+                totalFishes += 1;
+            }
+        }
     }
 
 
