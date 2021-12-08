@@ -142,32 +142,60 @@ public class Day_08 : MonoBehaviour
         //1 ab
         UnknownNumber number_1 = numbersDictionary[1];
 
-        sevenDigits.RemoveNot(number_1.charactersArray, sevenDigits.TR);
-        sevenDigits.RemoveNot(number_1.charactersArray, sevenDigits.BR);
+        sevenDigits.RemoveNot(number_1.charactersArray, new List<char>[] { sevenDigits.TR, sevenDigits.BR });
 
-        sevenDigits.Remove(number_1.charactersArray, sevenDigits.T);
-        sevenDigits.Remove(number_1.charactersArray, sevenDigits.M);
-        sevenDigits.Remove(number_1.charactersArray, sevenDigits.B);
-        sevenDigits.Remove(number_1.charactersArray, sevenDigits.TL);
-        sevenDigits.Remove(number_1.charactersArray, sevenDigits.BL);
+        sevenDigits.Remove(number_1.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.M, sevenDigits.B, sevenDigits.TL, sevenDigits.BL });
+
 
         //7 dab
         UnknownNumber number_7 = numbersDictionary[7];
+        
+        sevenDigits.RemoveNot(number_7.charactersArray, new List<char>[] { sevenDigits.TR, sevenDigits.BR, sevenDigits.T });
 
-        sevenDigits.RemoveNot(number_7.charactersArray, sevenDigits.TR);
-        sevenDigits.RemoveNot(number_7.charactersArray, sevenDigits.BR);
-        sevenDigits.RemoveNot(number_7.charactersArray, sevenDigits.T);
-
-        sevenDigits.Remove(number_7.charactersArray, sevenDigits.M);
-        sevenDigits.Remove(number_7.charactersArray, sevenDigits.B);
-        sevenDigits.Remove(number_7.charactersArray, sevenDigits.TL);
-        sevenDigits.Remove(number_7.charactersArray, sevenDigits.BL);
+        sevenDigits.Remove(number_7.charactersArray, new List<char>[] { sevenDigits.M, sevenDigits.B, sevenDigits.TL, sevenDigits.BL });
 
         //The top array should now include just d
-        sevenDigits.T.Display();
-        sevenDigits.TR.Display();
-        sevenDigits.BR.Display();
-        sevenDigits.B.Display();
+        //sevenDigits.T.Display();
+        //sevenDigits.TR.Display();
+        //sevenDigits.BR.Display();
+        //sevenDigits.B.Display();
+
+
+        //4 eafb
+        UnknownNumber number_4 = numbersDictionary[4];
+
+        sevenDigits.RemoveNot(number_4.charactersArray, new List<char>[] { sevenDigits.TL, sevenDigits.M, sevenDigits.TR, sevenDigits.BR });
+
+        sevenDigits.Remove(number_4.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.B, sevenDigits.BL });
+
+        //sevenDigits.Display();
+
+        //All but the T List should now have 2 letters
+        // T: d
+        // M: e f
+        // B: c g
+        //TL: e f
+        //TR: a b
+        //BL: c g
+        //BR: a b
+
+        //Numbers left to figure out:
+        //0: cagedb
+        //2: gcdfa
+        //3: fbcad
+        //5: cdfbe
+        //6: cdfgeb
+        //9: cefabd
+
+        //Continue to remove numbers
+
+        //0
+        //List<char> number_0 = new List<char>("cagedb".ToCharArray());
+
+
+
+
+        sevenDigits.Display();
     }
 
 
@@ -211,6 +239,14 @@ public class Day_08 : MonoBehaviour
             }
         }
 
+        public void RemoveNot(List<char> charactersToKeep, List<char>[] charactersListArray)
+        {
+            foreach (List<char> charactersList in charactersListArray)
+            {
+                RemoveNot(charactersToKeep, charactersList);
+            }
+        }
+
         public void Remove(List<char> charactersToRemove, List<char> charactersList)
         {
             List<char> charactersToRemoveAfterChecking = new List<char>();
@@ -227,6 +263,27 @@ public class Day_08 : MonoBehaviour
             {
                 charactersList.Remove(c);
             }
+        }
+
+        public void Remove(List<char> charactersToRemove, List<char>[] charactersListArray)
+        {
+            foreach (List<char> charactersList in charactersListArray)
+            {
+                Remove(charactersToRemove, charactersList);
+            }
+        }
+
+
+
+        public void Display()
+        {
+            T.Display(" T:");
+            M.Display(" M:");
+            B.Display(" B:");
+            TL.Display("TL:");
+            TR.Display("TR:");
+            BL.Display("BL:");
+            BR.Display("BR:");
         }
     }
 
