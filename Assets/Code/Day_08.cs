@@ -100,6 +100,7 @@ public class Day_08 : MonoBehaviour
         //cdbaf: 3
 
         string[] testNumbers = { "acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab" };
+        string[] testAnswers = { "cdfeb", "fcadb", "cdfeb", "cdbaf" };
 
         //Convert to an easier data structure to work with
         List<UnknownNumber> numbers = new List<UnknownNumber>();
@@ -275,14 +276,26 @@ public class Day_08 : MonoBehaviour
         //BL: g
         //BR: b
 
-        Debug.Log(sevenDigits.DecodeString("cdfeb"));
-        Debug.Log(sevenDigits.DecodeString("fcadb"));
-        Debug.Log(sevenDigits.DecodeString("cdfeb"));
-        Debug.Log(sevenDigits.DecodeString("cdbaf"));
+
+        int finalAnswer = 0;
+
+        int[] multiplier = { 1000, 100, 10, 1 };
+
+        for (int i = 0; i < testAnswers.Length; i++)
+        {
+            int decodedNumber = sevenDigits.DecodeString(testAnswers[i]);
+
+            finalAnswer += (decodedNumber * multiplier[i]);
+
+            Debug.Log($"{testAnswers[i]}: {decodedNumber}");
+        }
 
 
         Debug.Log("Answer to the problem: ");
+
         sevenDigits.DisplayArrays();
+
+        Debug.Log($"Final sum: {finalAnswer}");
     }
 
 
