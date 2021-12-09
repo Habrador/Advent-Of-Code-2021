@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Day_09 : MonoBehaviour
@@ -63,7 +64,16 @@ public class Day_09 : MonoBehaviour
         }
 
 
-        //Sort to find the 3 largest basins
+        //Find the three largest basins and multiply their sizes together
+        List<Basin> sortedBaisins = basins.OrderBy(o => o.Size).ToList();
+
+        sortedBaisins.Reverse();
+
+        int finalAnswer = sortedBaisins[0].Size * sortedBaisins[1].Size * sortedBaisins[2].Size;
+
+
+        //Should be 1122700
+        Debug.Log($"Final answer: {finalAnswer}");
     }
 
 
@@ -71,9 +81,9 @@ public class Day_09 : MonoBehaviour
     public class Basin
     {
         //All cells that belongs to this basin
-        public List<Vector2Int> cells = new List<Vector2Int>();
+        public List<Vector2Int> basinCells = new List<Vector2Int>();
 
-        public int Size => cells.Count;
+        public int Size => basinCells.Count;
 
         //The lowest point of the basin
         public Vector2Int lowPoint;
@@ -114,7 +124,7 @@ public class Day_09 : MonoBehaviour
                 Vector2Int currentCell = cellsToFlowFrom.Dequeue();
 
                 //Add it to the list of cells that belongs to this basin
-                cells.Add(currentCell);
+                basinCells.Add(currentCell);
 
                 //Get valid surrounding cells 
                 List<Vector2Int> surroundingCells = GetSurroundingCells(currentCell, heightMap, cellsToFlowFrom);
@@ -136,6 +146,38 @@ public class Day_09 : MonoBehaviour
         private List<Vector2Int> GetSurroundingCells(Vector2Int currentCell, int[,] heightMap, Queue<Vector2Int> cellsToFlowFrom)
         {
             List<Vector2Int> surroundingCells = new List<Vector2Int>();
+
+            Vector2Int[] surrounding = { new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(1, 0), new Vector2Int(0, -1) };
+
+            int mapSize = heightMap.GetLength(0);
+
+            foreach (Vector2Int surr in surrounding)
+            {
+                Vector2Int cell = new Vector2Int(currentCell.x + surr.x, currentCell.y + surr.y);
+
+                //The cell is outside of the map
+                if (!IsWithinMap(cell.x, cell.y, mapSize))
+                {
+                    continue;
+                }
+
+                //The cell has a height of 9 = border
+                int height = heightMap[cell.x, cell.y];
+
+                if (height == 9)
+                {
+                    continue;
+                }
+
+                //The cell has already been visited
+                if (cellsToFlowFrom.Contains(cell) || basinCells.Contains(cell))
+                {
+                    continue;
+                }
+
+                surroundingCells.Add(cell);
+            }
+
 
             return surroundingCells;
         }
@@ -200,7 +242,7 @@ public class Day_09 : MonoBehaviour
 
 
     //Is a cell within the map
-    private bool IsWithinMap(int x, int y, int mapSize)
+    private static bool IsWithinMap(int x, int y, int mapSize)
     {
         //Make sure this cell is within the map
         if (x < 0 || x >= mapSize || y < 0 || y >= mapSize)
