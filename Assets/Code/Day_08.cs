@@ -72,7 +72,7 @@ public class Day_08 : MonoBehaviour
     {
         GetData(out List<string[]> column_L, out List<string[]> column_R);
 
-        //Test case: acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf
+        //Test case input: acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf
         //acedgfb: 8
         //cdfbe: 5
         //gcdfa: 2
@@ -92,68 +92,52 @@ public class Day_08 : MonoBehaviour
         //g    b
         // cccc
 
-        //Then, the four digits of the output value can be decoded:
+        //Which is renamed to this in the data strcutures:
+        //  T
+        //TL TR
+        //  M
+        //BL BR
+        //  B
 
-        //cdfeb: 5
-        //fcadb: 3
-        //cdfeb: 5
-        //cdbaf: 3
 
         string[] testNumbers = { "acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab" };
         string[] testAnswers = { "cdfeb", "fcadb", "cdfeb", "cdbaf" };
 
-        //Convert to an easier data structure to work with
-        List<UnknownNumber> numbers = new List<UnknownNumber>();
+       
 
-        Dictionary<int, UnknownNumber> numbersDictionary = new Dictionary<int, UnknownNumber>();
-
-        foreach (string numberString in testNumbers)
-        {
-            UnknownNumber unknownNumber = new UnknownNumber(numberString);
-        
-            numbers.Add(unknownNumber);
-
-            //We know 1, 4, 7, 8
-            if (unknownNumber.correspondingNumber == 1)
-            {
-                numbersDictionary[1] = unknownNumber;
-            }
-            else if (unknownNumber.correspondingNumber == 4)
-            {
-                numbersDictionary[4] = unknownNumber;
-            }
-            else if (unknownNumber.correspondingNumber == 7)
-            {
-                numbersDictionary[7] = unknownNumber;
-            }
-            else if (unknownNumber.correspondingNumber == 8)
-            {
-                numbersDictionary[8] = unknownNumber;
-            }
-        }
-
-        //Debug.Log(numbersDictionary.Count);
-
+        //The digital clock
         SevenDigits sevenDigits = new SevenDigits();
 
 
-
-        //Remove letters from the Lists in seven sigits that we know
-
-        //1 ab
-        UnknownNumber number_1 = numbersDictionary[1];
-
-        sevenDigits.RemoveNot(number_1.charactersArray, new List<char>[] { sevenDigits.TR, sevenDigits.BR });
-
-        sevenDigits.Remove(number_1.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.M, sevenDigits.B, sevenDigits.TL, sevenDigits.BL });
+        //Remove characters we can remove from the lists in SevenDigits until each list has just a single character (= the solution!)
 
 
-        //7 dab
-        UnknownNumber number_7 = numbersDictionary[7];
-        
-        sevenDigits.RemoveNot(number_7.charactersArray, new List<char>[] { sevenDigits.TR, sevenDigits.BR, sevenDigits.T });
+        //
+        // Remove 1
+        //
 
-        sevenDigits.Remove(number_7.charactersArray, new List<char>[] { sevenDigits.M, sevenDigits.B, sevenDigits.TL, sevenDigits.BL });
+        //ab
+        string number_1_string = GetStringWithLength(testNumbers, 2);
+
+        List<char> number_1_array = new List<char>(number_1_string.ToCharArray());
+
+        sevenDigits.RemoveNot(number_1_array, new List<char>[] { sevenDigits.TR, sevenDigits.BR });
+
+        sevenDigits.Remove(number_1_array, new List<char>[] { sevenDigits.T, sevenDigits.M, sevenDigits.B, sevenDigits.TL, sevenDigits.BL });
+
+
+        //
+        // Remove 7
+        //
+
+        //dab
+        string number_7_string = GetStringWithLength(testNumbers, 3);
+
+        List<char> number_7_array = new List<char>(number_7_string.ToCharArray());
+
+        sevenDigits.RemoveNot(number_7_array, new List<char>[] { sevenDigits.TR, sevenDigits.BR, sevenDigits.T });
+
+        sevenDigits.Remove(number_7_array, new List<char>[] { sevenDigits.M, sevenDigits.B, sevenDigits.TL, sevenDigits.BL });
 
         //The top array should now include just d
         //sevenDigits.T.Display();
@@ -162,16 +146,22 @@ public class Day_08 : MonoBehaviour
         //sevenDigits.B.Display();
 
 
-        //4 eafb
-        UnknownNumber number_4 = numbersDictionary[4];
+        //
+        // Remove 4
+        //
 
-        sevenDigits.RemoveNot(number_4.charactersArray, new List<char>[] { sevenDigits.TL, sevenDigits.M, sevenDigits.TR, sevenDigits.BR });
+        //eafb
+        string number_4_string = GetStringWithLength(testNumbers, 4);
 
-        sevenDigits.Remove(number_4.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.B, sevenDigits.BL });
+        List<char> number_4_array = new List<char>(number_4_string.ToCharArray());
+
+        sevenDigits.RemoveNot(number_4_array, new List<char>[] { sevenDigits.TL, sevenDigits.M, sevenDigits.TR, sevenDigits.BR });
+
+        sevenDigits.Remove(number_4_array, new List<char>[] { sevenDigits.T, sevenDigits.B, sevenDigits.BL });
 
         //sevenDigits.Display();
 
-        //All but the T List should now have 2 letters
+        //All but the T List should now have 2 letters remaining
         // T: d
         // M: e f
         // B: c g
@@ -191,11 +181,16 @@ public class Day_08 : MonoBehaviour
         //3: fbcad, 5
         //5: cdfbe, 5
 
-
         //A letter combination of 6 can be numbers: 0, 6, 9
         //A letter combination of 5 can be numbers: 2, 3, 5
 
-        //3 includes both TR and BR (2 and 5 includes just one), so we can identify the 3 by finding those two characters in a character combination with length 5 
+
+        //
+        // Remove 3
+        //
+
+        //3 includes both TR and BR (2 and 5 includes either TR or BR)
+        //So we can identify the 3 by finding those two TR/BR characters in a character combination with length 5 
         string number_3_string = "";
 
         foreach (string s in testNumbers)
@@ -213,13 +208,11 @@ public class Day_08 : MonoBehaviour
 
         //Debug.Log($"Number 3 is: {number_3_string}");
 
-        UnknownNumber number_3 = new UnknownNumber(number_3_string);
+        List<char> number_3_array = new List<char>(number_3_string.ToCharArray());
 
-        numbersDictionary[3] = number_3;
+        sevenDigits.RemoveNot(number_3_array, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.BR, sevenDigits.B, sevenDigits.M });
 
-        sevenDigits.RemoveNot(number_3.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.BR, sevenDigits.B, sevenDigits.M });
-
-        sevenDigits.Remove(number_3.charactersArray, new List<char>[] { sevenDigits.TL, sevenDigits.BL });
+        sevenDigits.Remove(number_3_array, new List<char>[] { sevenDigits.TL, sevenDigits.BL });
 
         //Now we have the following 
         // T: d
@@ -230,10 +223,14 @@ public class Day_08 : MonoBehaviour
         //BL: g
         //BR: a b
 
-        //To figure out TR and BR we can again use 2 and 5
-        //2 includes TR and BL
-        //We now know BL
-        //3 doesnt include BL so we dont have to worry about that one! 
+
+        //
+        // Remove 2
+        //
+
+        //To figure out TR and BR we can again use 2, 3, 5
+        //Number 2 includes TR and BL (not BR) (Number 5 includes neither TR nor BL)
+        //We now know BL so we can identify number 2 which is the only number of (2, 3, 5) that includes BL
         char BL = sevenDigits.BL[0];
 
         string number_2_string = "";
@@ -251,17 +248,20 @@ public class Day_08 : MonoBehaviour
             }
         }
 
-        UnknownNumber number_2 = new UnknownNumber(number_2_string);
+        List<char> number_2_array = new List<char>(number_2_string.ToCharArray()); 
 
-        numbersDictionary[2] = number_2;
+        sevenDigits.RemoveNot(number_2_array, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.M, sevenDigits.BL, sevenDigits.B });
 
-        sevenDigits.RemoveNot(number_2.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.M, sevenDigits.BL, sevenDigits.B });
-
-        sevenDigits.Remove(number_2.charactersArray, new List<char>[] { sevenDigits.TL, sevenDigits.BR });
+        sevenDigits.Remove(number_2_array, new List<char>[] { sevenDigits.TL, sevenDigits.BR });
 
         //And that should be it!
 
-        //Decode the output 
+
+
+        //
+        // Decode the output 
+        //
+        
         //Answer, characters
         //5: cdfeb: T TL M BR B: d e f b c
         //3: fcadb: T TR M BR B: d a f b c 
@@ -287,7 +287,7 @@ public class Day_08 : MonoBehaviour
 
             finalAnswer += (decodedNumber * multiplier[i]);
 
-            Debug.Log($"{testAnswers[i]}: {decodedNumber}");
+            //Debug.Log($"{testAnswers[i]}: {decodedNumber}");
         }
 
 
@@ -300,6 +300,27 @@ public class Day_08 : MonoBehaviour
 
 
 
+    //Get a string with a certain length
+    private string GetStringWithLength(string[] strings, int length)
+    {
+        string result = "";
+    
+        foreach (string s in strings)
+        {
+            if (s.Length == length)
+            {
+                result = s;
+
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
+
+    //Get all strings with a certain length
     private List<string> GetStringsWithLength(string[] strings, int length)
     {
         List<string> results = new List<string>();
@@ -317,6 +338,7 @@ public class Day_08 : MonoBehaviour
 
 
 
+    //The digital clock display
     public class SevenDigits
     {
         //This is the display:
@@ -415,8 +437,6 @@ public class Day_08 : MonoBehaviour
                 if (T.IndexOf(c) != -1)
                 {
                     activeDisplays[Display.T] = true;
-
-                    //Debug.Log("Hello");
                 }
                 else if (M.IndexOf(c) != -1)
                 {
@@ -572,82 +592,6 @@ public class Day_08 : MonoBehaviour
             TR.Display("TR:");
             BL.Display("BL:");
             BR.Display("BR:");
-        }
-    }
-
-
-
-
-    public class UnknownNumber
-    {
-        //Which of the seven digits are on?
-        //public bool isA, isB, isC, isD, isE, isF, isG;
-
-        //Which number is this?
-        public int correspondingNumber;
-
-        public List<char> charactersArray;
-
-        public UnknownNumber(string stringInput)
-        {
-            //foreach (char letter in stringInput)
-            //{
-            //    if (letter == 'a')
-            //    {
-            //        isA = true;
-            //    }
-            //    else if (letter == 'b')
-            //    {
-            //        isB = true;
-            //    }
-            //    else if (letter == 'c')
-            //    {
-            //        isC = true;
-            //    }
-            //    else if (letter == 'd')
-            //    {
-            //        isD = true;
-            //    }
-            //    else if (letter == 'e')
-            //    {
-            //        isE = true;
-            //    }
-            //    else if (letter == 'f')
-            //    {
-            //        isF = true;
-            //    }
-            //    else if (letter == 'g')
-            //    {
-            //        isG = true;
-            //    }
-            //}
-
-
-            //Now we can also check if this is an 1, 4, 7, 8
-            //2-letter combination: 1
-            //3-letter combination: 7
-            //4-letter combination: 4
-            //7-letter combination: 8
-            if (stringInput.Length == 2)
-            {
-                correspondingNumber = 1;
-            }
-            else if (stringInput.Length == 3)
-            {
-                correspondingNumber = 7;
-            }
-            else if (stringInput.Length == 4)
-            {
-                correspondingNumber = 4;
-            }
-            else if (stringInput.Length == 7)
-            {
-                correspondingNumber = 8;
-            }
-
-
-            //Save the characters
-            charactersArray = new List<char>(stringInput.ToCharArray());
         }
     }
 
