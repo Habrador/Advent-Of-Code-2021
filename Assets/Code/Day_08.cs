@@ -99,25 +99,101 @@ public class Day_08 : MonoBehaviour
         //BL BR
         //  B
 
+        //string[] testNumbers = { "acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab" };
+        //string[] testAnswers = { "cdfeb", "fcadb", "cdfeb", "cdbaf" };
 
-        string[] testNumbers = { "acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab" };
-        string[] testAnswers = { "cdfeb", "fcadb", "cdfeb", "cdbaf" };
+        int finalAnswer = 0;
 
-       
-
-        //The digital clock
-        SevenDigits sevenDigits = new SevenDigits();
-
-
-        //Remove characters we can remove from the lists in SevenDigits until each list has just a single character (= the solution!)
+        for (int row = 0; row < column_L.Count; row++)
+        {
+            string[] testNumbers = column_L[row];
+            string[] testAnswers = column_R[row];
 
 
+
+            //The digital clock
+            SevenDigits sevenDigits = new SevenDigits();
+
+
+            //Remove characters we can remove from the lists in SevenDigits until each list has just a single character (= the solution!)
+            RemoveCharacters(sevenDigits, testNumbers);
+
+
+
+            //
+            // Decode the output 
+            //
+
+            //Answer, characters
+            //5: cdfeb: T TL M BR B: d e f b c
+            //3: fcadb: T TR M BR B: d a f b c 
+            //5: cdfeb 
+            //3: cdbaf
+
+            // T: d
+            // M: f
+            // B: c
+            //TL: e
+            //TR: a
+            //BL: g
+            //BR: b
+
+
+            int outputSum = 0;
+
+            int[] multiplier = { 1000, 100, 10, 1 };
+
+            for (int i = 0; i < testAnswers.Length; i++)
+            {
+                int decodedNumber = sevenDigits.DecodeString(testAnswers[i]);
+
+                outputSum += (decodedNumber * multiplier[i]);
+
+                //Debug.Log($"{testAnswers[i]}: {decodedNumber}");
+            }
+
+            finalAnswer += outputSum;
+
+
+            //Debug.Log("Answer to the problem: ");
+
+            //sevenDigits.DisplayArrays();
+        }
+
+        //Should be  994266
+        Debug.Log($"Final sum: {finalAnswer}");
+    }
+
+
+
+    //Get a string with a certain length
+    private string GetStringWithLength(string[] strings, int length)
+    {
+        string result = "";
+    
+        foreach (string s in strings)
+        {
+            if (s.Length == length)
+            {
+                result = s;
+
+                break;
+            }
+        }
+
+        return result;
+    }
+
+
+
+    private void RemoveCharacters(SevenDigits sevenDigits, string[] inputNumbers)
+    {
         //
         // Remove 1
         //
 
         //ab
-        string number_1_string = GetStringWithLength(testNumbers, 2);
+        string number_1_string = GetStringWithLength(inputNumbers, 2);
 
         List<char> number_1_array = new List<char>(number_1_string.ToCharArray());
 
@@ -131,7 +207,7 @@ public class Day_08 : MonoBehaviour
         //
 
         //dab
-        string number_7_string = GetStringWithLength(testNumbers, 3);
+        string number_7_string = GetStringWithLength(inputNumbers, 3);
 
         List<char> number_7_array = new List<char>(number_7_string.ToCharArray());
 
@@ -151,7 +227,7 @@ public class Day_08 : MonoBehaviour
         //
 
         //eafb
-        string number_4_string = GetStringWithLength(testNumbers, 4);
+        string number_4_string = GetStringWithLength(inputNumbers, 4);
 
         List<char> number_4_array = new List<char>(number_4_string.ToCharArray());
 
@@ -193,7 +269,7 @@ public class Day_08 : MonoBehaviour
         //So we can identify the 3 by finding those two TR/BR characters in a character combination with length 5 
         string number_3_string = "";
 
-        foreach (string s in testNumbers)
+        foreach (string s in inputNumbers)
         {
             if (s.Length == 5)
             {
@@ -235,7 +311,7 @@ public class Day_08 : MonoBehaviour
 
         string number_2_string = "";
 
-        foreach (string s in testNumbers)
+        foreach (string s in inputNumbers)
         {
             if (s.Length == 5)
             {
@@ -248,74 +324,13 @@ public class Day_08 : MonoBehaviour
             }
         }
 
-        List<char> number_2_array = new List<char>(number_2_string.ToCharArray()); 
+        List<char> number_2_array = new List<char>(number_2_string.ToCharArray());
 
         sevenDigits.RemoveNot(number_2_array, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.M, sevenDigits.BL, sevenDigits.B });
 
         sevenDigits.Remove(number_2_array, new List<char>[] { sevenDigits.TL, sevenDigits.BR });
 
         //And that should be it!
-
-
-
-        //
-        // Decode the output 
-        //
-        
-        //Answer, characters
-        //5: cdfeb: T TL M BR B: d e f b c
-        //3: fcadb: T TR M BR B: d a f b c 
-        //5: cdfeb 
-        //3: cdbaf
-
-        // T: d
-        // M: f
-        // B: c
-        //TL: e
-        //TR: a
-        //BL: g
-        //BR: b
-
-
-        int finalAnswer = 0;
-
-        int[] multiplier = { 1000, 100, 10, 1 };
-
-        for (int i = 0; i < testAnswers.Length; i++)
-        {
-            int decodedNumber = sevenDigits.DecodeString(testAnswers[i]);
-
-            finalAnswer += (decodedNumber * multiplier[i]);
-
-            //Debug.Log($"{testAnswers[i]}: {decodedNumber}");
-        }
-
-
-        Debug.Log("Answer to the problem: ");
-
-        sevenDigits.DisplayArrays();
-
-        Debug.Log($"Final sum: {finalAnswer}");
-    }
-
-
-
-    //Get a string with a certain length
-    private string GetStringWithLength(string[] strings, int length)
-    {
-        string result = "";
-    
-        foreach (string s in strings)
-        {
-            if (s.Length == length)
-            {
-                result = s;
-
-                break;
-            }
-        }
-
-        return result;
     }
 
 
@@ -641,36 +656,4 @@ public class Day_08 : MonoBehaviour
         //Debug.Log(column_L.Count);
         //Debug.Log(column_R.Count);
     }
-
-
-
-    /*
-       //A solution is to use brute force and test all possible combinations
-
-       List<int[]> answerCombinations_6 = new List<int[]>();
-
-       answerCombinations_6.Add(new int[] { 0, 6, 9 });
-       answerCombinations_6.Add(new int[] { 0, 9, 6 });
-       answerCombinations_6.Add(new int[] { 6, 0, 9 });
-       answerCombinations_6.Add(new int[] { 6, 9, 0 });
-       answerCombinations_6.Add(new int[] { 9, 0, 6 });
-       answerCombinations_6.Add(new int[] { 9, 6, 0 });
-
-       List<int[]> answerCombinations_5 = new List<int[]>();
-
-       answerCombinations_6.Add(new int[] { 2, 3, 5 });
-       answerCombinations_6.Add(new int[] { 2, 5, 3 });
-       answerCombinations_6.Add(new int[] { 3, 2, 5 });
-       answerCombinations_6.Add(new int[] { 3, 5, 2 });
-       answerCombinations_6.Add(new int[] { 5, 2, 3 });
-       answerCombinations_6.Add(new int[] { 5, 3, 2 });
-
-       //We also need to keep track of which string belongs to which number in the answer-combinations
-       List<string> stringCombinations_6 = GetStringsWithLength(testNumbers, 6);
-       List<string> stringCombinations_5 = GetStringsWithLength(testNumbers, 5);
-
-       //Debug
-       //stringCombinations_5.Display();
-       //stringCombinations_6.Display();
-       */
 }
