@@ -180,22 +180,108 @@ public class Day_08 : MonoBehaviour
         //BR: a b
 
         //Numbers left to figure out:
-        //0: cagedb
-        //2: gcdfa
-        //3: fbcad
-        //5: cdfbe
-        //6: cdfgeb
-        //9: cefabd
+        //True answer, characters, digits
 
-        //Continue to remove numbers
+        //0: cagedb, 6
+        //6: cdfgeb, 6
+        //9: cefabd, 6
 
-        //0
-        //List<char> number_0 = new List<char>("cagedb".ToCharArray());
+        //2: gcdfa, 5
+        //3: fbcad, 5
+        //5: cdfbe, 5
 
 
+        //A letter combination of 6 can be numbers: 0, 6, 9
+        //A letter combination of 5 can be numbers: 2, 3, 5
+
+        //3 includes both TR and BR (2 and 5 includes just one), so we can identify the 3 by finding those two characters in a character combination with length 5 
+        string number_3_string = "";
+
+        foreach (string s in testNumbers)
+        {
+            if (s.Length == 5)
+            {
+                if (s.IndexOf(sevenDigits.BR[0]) != -1 && s.IndexOf(sevenDigits.BR[1]) != -1)
+                {
+                    number_3_string = s;
+
+                    break;
+                }
+            }
+        }
+
+        //Debug.Log($"Number 3 is: {number_3_string}");
+
+        UnknownNumber number_3 = new UnknownNumber(number_3_string);
+
+        numbersDictionary[3] = number_3;
+
+        sevenDigits.RemoveNot(number_3.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.BR, sevenDigits.B, sevenDigits.M });
+
+        sevenDigits.Remove(number_3.charactersArray, new List<char>[] { sevenDigits.TL, sevenDigits.BL });
+
+        //Now we have the following 
+        // T: d
+        // M: f
+        // B: c
+        //TL: e
+        //TR: a b
+        //BL: g
+        //BR: a b
+
+        //To figure out TR and BR we can again use 2 and 5
+        //2 includes TR and BL
+        //We now know BL
+        //3 doesnt include BL so we dont have to worry about that one! 
+        char BL = sevenDigits.BL[0];
+
+        string number_2_string = "";
+
+        foreach (string s in testNumbers)
+        {
+            if (s.Length == 5)
+            {
+                if (s.IndexOf(BL) != -1)
+                {
+                    number_2_string = s;
+
+                    break;
+                }
+            }
+        }
+
+        UnknownNumber number_2 = new UnknownNumber(number_2_string);
+
+        numbersDictionary[2] = number_2;
+
+        sevenDigits.RemoveNot(number_2.charactersArray, new List<char>[] { sevenDigits.T, sevenDigits.TR, sevenDigits.M, sevenDigits.BL, sevenDigits.B });
+
+        sevenDigits.Remove(number_2.charactersArray, new List<char>[] { sevenDigits.TL, sevenDigits.BR });
+
+        //And that should be it!
 
 
+       
+
+        Debug.Log("Answer to the problem: ");
         sevenDigits.Display();
+    }
+
+
+
+    private List<string> GetStringsWithLength(string[] strings, int length)
+    {
+        List<string> results = new List<string>();
+
+        foreach (string s in strings)
+        {
+            if (s.Length == length)
+            {
+                results.Add(s);
+            }
+        }
+
+        return results;
     }
 
 
@@ -409,4 +495,36 @@ public class Day_08 : MonoBehaviour
         //Debug.Log(column_L.Count);
         //Debug.Log(column_R.Count);
     }
+
+
+
+    /*
+       //A solution is to use brute force and test all possible combinations
+
+       List<int[]> answerCombinations_6 = new List<int[]>();
+
+       answerCombinations_6.Add(new int[] { 0, 6, 9 });
+       answerCombinations_6.Add(new int[] { 0, 9, 6 });
+       answerCombinations_6.Add(new int[] { 6, 0, 9 });
+       answerCombinations_6.Add(new int[] { 6, 9, 0 });
+       answerCombinations_6.Add(new int[] { 9, 0, 6 });
+       answerCombinations_6.Add(new int[] { 9, 6, 0 });
+
+       List<int[]> answerCombinations_5 = new List<int[]>();
+
+       answerCombinations_6.Add(new int[] { 2, 3, 5 });
+       answerCombinations_6.Add(new int[] { 2, 5, 3 });
+       answerCombinations_6.Add(new int[] { 3, 2, 5 });
+       answerCombinations_6.Add(new int[] { 3, 5, 2 });
+       answerCombinations_6.Add(new int[] { 5, 2, 3 });
+       answerCombinations_6.Add(new int[] { 5, 3, 2 });
+
+       //We also need to keep track of which string belongs to which number in the answer-combinations
+       List<string> stringCombinations_6 = GetStringsWithLength(testNumbers, 6);
+       List<string> stringCombinations_5 = GetStringsWithLength(testNumbers, 5);
+
+       //Debug
+       //stringCombinations_5.Display();
+       //stringCombinations_6.Display();
+       */
 }
