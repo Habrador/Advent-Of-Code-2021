@@ -260,11 +260,29 @@ public class Day_08 : MonoBehaviour
 
         //And that should be it!
 
+        //Decode the output 
+        //Answer, characters
+        //5: cdfeb: T TL M BR B: d e f b c
+        //3: fcadb: T TR M BR B: d a f b c 
+        //5: cdfeb 
+        //3: cdbaf
 
-       
+        // T: d
+        // M: f
+        // B: c
+        //TL: e
+        //TR: a
+        //BL: g
+        //BR: b
+
+        Debug.Log(sevenDigits.DecodeString("cdfeb"));
+        Debug.Log(sevenDigits.DecodeString("fcadb"));
+        Debug.Log(sevenDigits.DecodeString("cdfeb"));
+        Debug.Log(sevenDigits.DecodeString("cdbaf"));
+
 
         Debug.Log("Answer to the problem: ");
-        sevenDigits.Display();
+        sevenDigits.DisplayArrays();
     }
 
 
@@ -297,16 +315,18 @@ public class Day_08 : MonoBehaviour
         // e    f
         //  gggg
 
-        public List<char> T = new List<char>(new char[]{ 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
-        public List<char> M = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
-        public List<char> B = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
+        //All possible characters (we will remove characters from these lists to figure out the true answer)
+        public List<char> T  = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
+        public List<char> M  = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
+        public List<char> B  = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
         public List<char> TL = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
         public List<char> BL = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
         public List<char> TR = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
         public List<char> BR = new List<char>(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g' });
 
+        private enum Display { T, M, B, TL, BL, TR, BR }
 
-        //Remove all but these from the List
+        //Remove all but these from the list
         public void RemoveNot(List<char> charactersToKeep, List<char> charactersList)
         {
             List<char> charactersToRemove = new List<char>();
@@ -333,6 +353,8 @@ public class Day_08 : MonoBehaviour
             }
         }
 
+
+        //Remobe characters from lists
         public void Remove(List<char> charactersToRemove, List<char> charactersList)
         {
             List<char> charactersToRemoveAfterChecking = new List<char>();
@@ -361,7 +383,174 @@ public class Day_08 : MonoBehaviour
 
 
 
-        public void Display()
+        //Decode from string to number
+        public int DecodeString(string characterCombination)
+        {
+            //Figure out which parts are lit
+            Dictionary<Display, bool> activeDisplays = new Dictionary<Display, bool>();
+
+            activeDisplays.Add(Display.T, false);
+            activeDisplays.Add(Display.M, false);
+            activeDisplays.Add(Display.B, false);
+            activeDisplays.Add(Display.TL, false);
+            activeDisplays.Add(Display.BL, false);
+            activeDisplays.Add(Display.TR, false);
+            activeDisplays.Add(Display.BR, false);
+
+            foreach (char c in characterCombination)
+            {
+                if (T.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.T] = true;
+
+                    //Debug.Log("Hello");
+                }
+                else if (M.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.M] = true;
+                }
+                else if (B.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.B] = true;
+                }
+                else if (TL.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.TL] = true;
+                }
+                else if (BL.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.BL] = true;
+                }
+                else if (TR.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.TR] = true;
+                }
+                else if (BR.IndexOf(c) != -1)
+                {
+                    activeDisplays[Display.BR] = true;
+                }
+            }
+
+
+            //Figure out which number is lit
+
+            //0
+            if (activeDisplays[Display.T] &&
+                !activeDisplays[Display.M] &&
+                activeDisplays[Display.B] &&
+                activeDisplays[Display.TL] &&
+                activeDisplays[Display.TR] &&
+                activeDisplays[Display.BL] &&
+                activeDisplays[Display.BR])
+            {
+                return 0;
+            }
+            //1
+            else if (!activeDisplays[Display.T] &&
+                     !activeDisplays[Display.M] &&
+                     !activeDisplays[Display.B] &&
+                     !activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     !activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 1;
+            }
+            //2
+            else if (activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     activeDisplays[Display.B] &&
+                     !activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     activeDisplays[Display.BL] &&
+                     !activeDisplays[Display.BR])
+            {
+                return 2;
+            }
+            //3
+            else if (activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     activeDisplays[Display.B] &&
+                     !activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     !activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 3;
+            }
+            //4
+            else if (!activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     !activeDisplays[Display.B] &&
+                     activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     !activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 4;
+            }
+            //5
+            else if (activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     activeDisplays[Display.B] &&
+                     activeDisplays[Display.TL] &&
+                     !activeDisplays[Display.TR] &&
+                     !activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 5;
+            }
+            //6
+            else if (activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     activeDisplays[Display.B] &&
+                     activeDisplays[Display.TL] &&
+                     !activeDisplays[Display.TR] &&
+                     activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 6;
+            }
+            //7
+            else if (activeDisplays[Display.T] &&
+                     !activeDisplays[Display.M] &&
+                     !activeDisplays[Display.B] &&
+                     !activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     !activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 7;
+            }
+            //8
+            else if (activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     activeDisplays[Display.B] &&
+                     activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 8;
+            }
+            //9
+            else if (activeDisplays[Display.T] &&
+                     activeDisplays[Display.M] &&
+                     activeDisplays[Display.B] &&
+                     activeDisplays[Display.TL] &&
+                     activeDisplays[Display.TR] &&
+                     !activeDisplays[Display.BL] &&
+                     activeDisplays[Display.BR])
+            {
+                return 9;
+            }
+
+            return -1;
+        }
+
+
+
+        public void DisplayArrays()
         {
             T.Display(" T:");
             M.Display(" M:");
