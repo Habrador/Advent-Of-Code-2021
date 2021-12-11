@@ -39,4 +39,25 @@ public static class ExtensionMethods
 
         Debug.Log(displayString);
     }
+
+
+    public static void Display(this int[,] int2dArray)
+    {
+        for (int row = 0; row < int2dArray.GetLength(0); row++)
+        {
+            string rowString = "";
+        
+            for (int col = 0; col < int2dArray.GetLength(0); col++)
+            {
+                rowString += int2dArray[row, col];
+
+                if (col < int2dArray.GetLength(0) - 1)
+                {
+                    rowString += ", ";
+                }
+            }
+
+            Debug.Log(rowString);
+        }
+    }
 }
