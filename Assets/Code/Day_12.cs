@@ -41,25 +41,25 @@ public class Day_12 : MonoBehaviour
         //    \   /
         //     end
 
-        //A valid path is start-A-c-A-b-end
         //A non valid path is start-A-c-A-b-d-b-end because b is a small cave and we can't visit it multiple times
+        //This means that d is never part of any path
 
         //In total, we get 10 valid paths:
-        //start, A,b,A,c,A,end
+        //start, A, b, A, c, A, end
         //start, A, b, A, end
-        //start, A,b,end
-        //start, A, c, A, b, A, end
-        //start, A,c,A,b,end
+        //start, A, b, end
+        //start, A, c, A, b, A, end: so we go A-b and then back to A, but we can't go A-b again
+        //start, A, c, A, b, end
         //start, A, c, A, end
-        //start, A,end
+        //start, A, end
         //start, b, A, c, A, end
-        //start, b,A,end
+        //start, b, A, end
         //start, b, end
 
-        allRowsString = testNetworkStrings;
+        //allRowsString = testNetworkStrings;
 
 
-        //Find distinctive nodes and node connections
+        //Find distinctive nodes
         List<string> nodeNames = new List<string>();
 
         foreach (string s in allRowsString)
@@ -141,6 +141,136 @@ public class Day_12 : MonoBehaviour
 
         //startNode.DisplayNode(nodeNames);
         //endNode.DisplayNode(nodeNames);
+
+        //The final list with all possible paths
+        List<List<Node>> allPaths = new List<List<Node>>();
+
+        //Is used when generating the paths
+        Queue<List<Node>> pathsToGenerate = new Queue<List<Node>>();
+
+        //Add the start node
+        List<Node> firstPath = new List<Node>();
+
+        firstPath.Add(startNode);
+
+        pathsToGenerate.Enqueue(firstPath);
+
+        //The loop
+        int safety = 0;
+
+        while (true)
+        {
+            safety += 1;
+
+            if (safety > 10000000)
+            {
+                Debug.Log("Stuck in infinite loop");
+
+                break;
+            }
+
+            if (pathsToGenerate.Count == 0)
+            {
+                Debug.Log("Finished generating paths!");
+
+                break;
+            }
+
+            List<Node> currentPath = pathsToGenerate.Dequeue();
+
+            //Now we need to clone this path and add all possible valid nodes it can go to
+            Node lastNodeInPath = currentPath[currentPath.Count - 1];
+
+            List<Node> connectedNodes = lastNodeInPath.connections;
+
+            foreach (Node nodeToAdd in connectedNodes)
+            {
+                if (IsConnectionValid(currentPath, nodeToAdd))
+                {
+                    List<Node> newPath = new List<Node>(currentPath);
+
+                    newPath.Add(nodeToAdd);
+
+                    //Is the path finished?
+                    if (nodeToAdd.nameIndex == endNode.nameIndex)
+                    {
+                        allPaths.Add(newPath);
+                    }
+                    //If not add it to the queue
+                    else
+                    {
+                        pathsToGenerate.Enqueue(newPath);
+                    }
+                }
+            }
+        }
+
+
+        //Display the paths
+        //Should be 3679
+        Debug.Log($"Number of paths generated: {allPaths.Count}");
+
+        //foreach (List<Node> path in allPaths)
+        //{
+        //    string pathString = "";
+        
+        //    for (int i = 0; i < path.Count; i++)
+        //    {
+        //        pathString += nodeNames[path[i].nameIndex];
+
+        //        if (i < path.Count - 1)
+        //        {
+        //            pathString += "-";
+        //        }
+        //    }
+
+        //    Debug.Log(pathString);
+        //}
+    }
+
+
+
+    private bool IsConnectionValid(List<Node> currentPath, Node nodeToAdd)
+    {
+        //The rules doesn't say so but we can't go back to start multiple times because it wouldn't make any sense
+        if (nodeToAdd.nameIndex == currentPath[0].nameIndex)
+        {
+            return false;
+        }
+
+
+        Node lastNodeInPath = currentPath[currentPath.Count - 1];
+
+        //A connection is not valid if we have seen it before
+        if (currentPath.Count > 1)
+        {
+            for (int i = 0; i < currentPath.Count - 1; i++)
+            {
+                Node thisNode = currentPath[i];
+                Node nextNode = currentPath[i + 1];
+
+                if (thisNode.nameIndex == lastNodeInPath.nameIndex && nextNode.nameIndex == nodeToAdd.nameIndex)
+                {
+                    return false;
+                }
+            }
+        }
+
+        //A connection is not valid if it goes to a small cave multiple times, meaning the node can only exist once
+        if (!nodeToAdd.isBigGave)
+        {
+            for (int i = 0; i < currentPath.Count; i++)
+            {
+                Node thisNode = currentPath[i];
+
+                if (thisNode.nameIndex == nodeToAdd.nameIndex)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 
