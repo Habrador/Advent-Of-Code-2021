@@ -185,7 +185,7 @@ public class Day_12 : MonoBehaviour
 
             foreach (Node nodeToAdd in connectedNodes)
             {
-                if (IsConnectionValid(currentPath, nodeToAdd))
+                if (IsConnectionValid_Part2(currentPath, nodeToAdd, nodeNames))
                 {
                     List<Node> newPath = new List<Node>(currentPath);
 
@@ -208,29 +208,32 @@ public class Day_12 : MonoBehaviour
 
         //Display the paths
         //Should be 3679
+        //Part 2: 107395
         Debug.Log($"Number of paths generated: {allPaths.Count}");
 
-        //foreach (List<Node> path in allPaths)
-        //{
-        //    string pathString = "";
-        
-        //    for (int i = 0; i < path.Count; i++)
-        //    {
-        //        pathString += nodeNames[path[i].nameIndex];
+        /*
+        foreach (List<Node> path in allPaths)
+        {
+            string pathString = "";
 
-        //        if (i < path.Count - 1)
-        //        {
-        //            pathString += "-";
-        //        }
-        //    }
+            for (int i = 0; i < path.Count; i++)
+            {
+                pathString += nodeNames[path[i].nameIndex];
 
-        //    Debug.Log(pathString);
-        //}
+                if (i < path.Count - 1)
+                {
+                    pathString += "-";
+                }
+            }
+
+            Debug.Log(pathString);
+        }
+        */
     }
 
 
 
-    private bool IsConnectionValid(List<Node> currentPath, Node nodeToAdd)
+    private bool IsConnectionValid_Part1(List<Node> currentPath, Node nodeToAdd, List<string> nodeNames)
     {
         //The rules doesn't say so but we can't go back to start multiple times because it wouldn't make any sense
         if (nodeToAdd.nameIndex == currentPath[0].nameIndex)
@@ -256,6 +259,7 @@ public class Day_12 : MonoBehaviour
             }
         }
 
+        
         //A connection is not valid if it goes to a small cave multiple times, meaning the node can only exist once
         if (!nodeToAdd.isBigGave)
         {
@@ -270,7 +274,124 @@ public class Day_12 : MonoBehaviour
             }
         }
 
+
         return true;
+    }
+
+
+
+    private bool IsConnectionValid_Part2(List<Node> currentPath, Node nodeToAdd, List<string> nodeNames)
+    {
+        //We can't go back to start multiple times
+        if (nodeToAdd.nameIndex == currentPath[0].nameIndex)
+        {
+            return false;
+        }
+        //But we can always go to the end
+        else if (nodeNames[nodeToAdd.nameIndex] == "end")
+        {
+            return true;
+        }
+
+        //Small caves
+        if (!nodeToAdd.isBigGave)
+        {
+            if (CanAddSmallCave(currentPath, nodeToAdd))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        Node lastNodeInPath = currentPath[currentPath.Count - 1];
+
+        //A connection is not valid if we have seen it before (unless we go back to a single small cave two times)
+        if (currentPath.Count > 1)
+        {
+            for (int i = 0; i < currentPath.Count - 1; i++)
+            {
+                Node thisNode = currentPath[i];
+                Node nextNode = currentPath[i + 1];
+
+                //start, A, c, A, b, A, b, A, end
+
+                //We only need to care about big caves because we have already dealt with the small caves
+                if (nodeToAdd.isBigGave && lastNodeInPath.isBigGave)
+                {
+                    if (thisNode.nameIndex == lastNodeInPath.nameIndex && nextNode.nameIndex == nodeToAdd.nameIndex)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+
+
+
+        return true;
+    }
+
+
+
+    private bool CanAddSmallCave(List<Node> currentPath, Node nodeToAdd)
+    {
+        //In part 2 you can visit a single small cave 2 times, but all other just once
+
+        //Use a dictionary to count how many times we have visited each small cave in the path
+        Dictionary<int, int> smallCaveOccurances = new Dictionary<int, int>();
+
+        foreach (Node node in currentPath)
+        {
+            if (node.isBigGave)
+            {
+                continue;
+            }
+
+            if (!smallCaveOccurances.ContainsKey(node.nameIndex))
+            {
+                smallCaveOccurances[node.nameIndex] = 1;
+            }
+            else
+            {
+                smallCaveOccurances[node.nameIndex] += 1;
+            }
+        }
+
+        //This cave doesnt exist at all in the path
+        if (!smallCaveOccurances.ContainsKey(nodeToAdd.nameIndex))
+        {
+            return true;
+        }
+        else
+        {
+            //Check if a small cave exists two times
+            bool smallCaveExistsTwoTimes = false;
+
+            foreach (KeyValuePair<int, int> item in smallCaveOccurances)
+            {
+                if (item.Value == 2)
+                {
+                    smallCaveExistsTwoTimes = true;
+
+                    break;
+                }
+            }
+
+            //If no other small cave exists two times, then this small cave can exist two times
+            if (!smallCaveExistsTwoTimes)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
 
