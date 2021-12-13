@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Day_13 : MonoBehaviour
@@ -7,6 +8,7 @@ public class Day_13 : MonoBehaviour
     
     private void Start()
     {
+        //Part 2 is also included here
         Part_1();
     }
 
@@ -52,6 +54,8 @@ public class Day_13 : MonoBehaviour
         int maxRow = -int.MaxValue;
         int maxCol = -int.MaxValue;
 
+        //int maxValue = -int.MaxValue;
+
         foreach (string row in dotsStrings)
         {
             string[] cooordinates = row.Split(',');
@@ -67,14 +71,33 @@ public class Day_13 : MonoBehaviour
             {
                 maxCol = coord_col;
             }
+
+            //Debug.Log(cooordinates[0] + " " + coord_row + " " + maxRow);
         }
 
-        //Debug.Log(maxRow);
-        //Debug.Log(maxCol);
+        Debug.Log($"Max row: {maxRow}, Max col: {maxCol}");
 
         //Generate the transparent paper
         //For some reason, the data is cols, rows
-        bool[,] transparentPaper = new bool[maxCol + 1, maxRow + 1];
+        
+        if (maxCol % 2 == 1)
+        {
+            maxCol += 1;
+        }
+        if (maxRow % 2 == 1)
+        {
+            maxRow += 1;
+        }
+
+        maxCol += 1;
+        maxRow += 1;
+
+        //CANT USE THE NUMBERS FROM THE ACTIVE DOTS = HOURS WASTED OF BUG FINDING
+        //USE THE NUMBERS FROM THE FOLD INSTSRUCTIONS
+        maxCol = 895;
+        maxRow = 1311;
+
+        bool[,] transparentPaper = new bool[maxCol, maxRow];
 
         //Fill the paper with dots
         foreach (string row in dotsStrings)
@@ -110,6 +133,8 @@ public class Day_13 : MonoBehaviour
         //    Debug.Log(instruction.direction + ": " + instruction.line);
         //}
 
+        //return;
+
 
         //
         // Fold the paper
@@ -120,8 +145,10 @@ public class Day_13 : MonoBehaviour
         //x means fold left
         //Overlapping dots merge
 
-        //int numberOfFolds = allInstructions.Count;
-        int numberOfFolds = 1;
+        Debug.Log($"Rows: {transparentPaper.GetLength(0)}, Cols: {transparentPaper.GetLength(1)}");
+
+        int numberOfFolds = allInstructions.Count;
+        //int numberOfFolds = 2;
 
         for (int fold = 0; fold < numberOfFolds; fold++)
         {
@@ -169,7 +196,7 @@ public class Day_13 : MonoBehaviour
                 {
                     //The corresponding row on the other side of the paper
                     int rowOther = (rowsAfterFold * 2) - row;
-          
+
                     for (int col = 0; col < transparentPaper.GetLength(1); col++)
                     {
                         bool dot_1 = transparentPaper[row, col];
@@ -185,7 +212,7 @@ public class Day_13 : MonoBehaviour
                 transparentPaper = transparentPaperAfterFold;
             }
 
-            
+            //Debug.Log($"Rows: {transparentPaper.GetLength(0)}, Cols: {transparentPaper.GetLength(1)}");
         }
 
 
@@ -193,22 +220,53 @@ public class Day_13 : MonoBehaviour
 
 
         //Count number of visible dots
-        int visibleDots = 0;
+        //int visibleDots = 0;
+
+        //for (int row = 0; row < transparentPaper.GetLength(0); row++)
+        //{
+        //    for (int col = 0; col < transparentPaper.GetLength(1); col++)
+        //    {
+        //        if (transparentPaper[row, col])
+        //        {
+        //            visibleDots += 1;
+        //        }
+        //    }
+        //}
+
+
+        //Should be 669
+        //Debug.Log($"Number of visible dots: {visibleDots}");
+
+
+        //In part 2, we have to print the result to a file to be able to zoom out and read some letters
+        //Should be UEFZCUCJ
+
+        string fullPath = "C:/tmp/day_13_output.txt";
+
+        List<string> allRowsOutput = new List<string>();
 
         for (int row = 0; row < transparentPaper.GetLength(0); row++)
         {
+            string rowString = "";
+
             for (int col = 0; col < transparentPaper.GetLength(1); col++)
             {
                 if (transparentPaper[row, col])
                 {
-                    visibleDots += 1;
+                    rowString += "#";
+                }
+                else
+                {
+                    rowString += ".";
                 }
             }
+
+            allRowsOutput.Add(rowString);
         }
 
+        File.WriteAllLines(fullPath, allRowsOutput);
 
-        //Should be 669
-        Debug.Log($"Number of visible dots: {visibleDots}");
+        Debug.Log("Finished!");
     }
 
 
