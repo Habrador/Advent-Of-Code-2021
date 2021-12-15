@@ -57,7 +57,7 @@ public class Day_14 : MonoBehaviour
         Dictionary<string, Dictionary<char, long>> occurancesLookup = new Dictionary<string, Dictionary<char, long>>();
 
         //Generate the template while counting characters
-        int MAX_STEPS = 25;
+        int MAX_STEPS = 1; //Should be 25 but changed to 1 in case we accidentally start the file which takes 4ever to run
 
         foreach (KeyValuePair<string, string> insertionRules in pairInsertionRules)
         {
