@@ -57,7 +57,7 @@ public class Day_14 : MonoBehaviour
         Dictionary<string, Dictionary<char, long>> occurancesLookup = new Dictionary<string, Dictionary<char, long>>();
 
         //Generate the template while counting characters
-        int MAX_STEPS = 2;
+        int MAX_STEPS = 25;
 
         foreach (KeyValuePair<string, string> insertionRules in pairInsertionRules)
         {
@@ -121,7 +121,7 @@ public class Day_14 : MonoBehaviour
 
         long finalAnswer = max - min;
 
-        //Should be 2027
+        //Should be 2265039461737
         Debug.Log($"Final answer: {finalAnswer}");
     }
 
