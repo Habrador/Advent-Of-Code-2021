@@ -59,5 +59,7 @@ public static class ExtensionMethods
 
             Debug.Log(rowString);
         }
+
+        Debug.Log("-");
     }
 }

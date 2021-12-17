@@ -15,7 +15,7 @@ public class Day_15 : MonoBehaviour
     private void Part_1()
     {
         //Get the data 
-        string[] allRowsString = FileManagement.GetInputData("Day_15", "input_test.txt");
+        string[] allRowsString = FileManagement.GetInputData("Day_15", "input.txt");
 
         //100x100 with numbers 1-9
         //Debug.Log(allRowsString.Length);
@@ -48,21 +48,23 @@ public class Day_15 : MonoBehaviour
 
         //Find the path with the lowest risk (= same as finding the shortest path where risk is the g)
         //We cant find all paths like in Day 12 because there are too many of them!
-        List<Vector2Int> lowestRiskPath = new List<Vector2Int>();
+        Node lowestRiskNode = null;
 
-        Vector2Int startNode = new Vector2Int(0, 0);
-        Vector2Int endNode = new Vector2Int(rows - 1, cols - 1);
+        Node startNode = new Node(new Vector2Int(0, 0), 0, null);
 
-        List<List<Vector2Int>> pathsToInvestigate = new List<List<Vector2Int>>();
+        Vector2Int endCoordinates = new Vector2Int(rows - 1, cols - 1);
+
+        bool[,] visitedCells = new bool[rows, cols];
+
+
+        HashSet<Node> nodesToInvestigate = new HashSet<Node>();
 
         //Add the start node
-        List<Vector2Int> firstPath = new List<Vector2Int>();
+        nodesToInvestigate.Add(startNode);
 
-        firstPath.Add(startNode);
+        //Node bestNodeSoFar = null;
 
-        //Debug.Log(firstPath.Contains(new Vector2Int(0, 0)));
-
-        pathsToInvestigate.Add(firstPath);
+        //List<Node> allNewNodes = new List<Node>();
 
         int safety = 0;
 
@@ -70,85 +72,136 @@ public class Day_15 : MonoBehaviour
         {
             safety += 1;
 
-            if (safety > 100)
+            if (safety > 10000)
             {
                 Debug.Log("Stuck in infinite loop");
 
                 break;
             }
 
-            if (pathsToInvestigate.Count == 0)
+            if (nodesToInvestigate.Count == 0)
             {
                 Debug.Log("We have found all paths");
 
                 break;
             }
 
-            List<Vector2Int> thisPath = GetLowestRiskPath(pathsToInvestigate, riskMap);
+            Node bestNodeSoFar = GetLowestRiskNode(nodesToInvestigate);
 
-            Debug.Log(thisPath[thisPath.Count - 1]);
+            //Did we reach the end?
+            if (bestNodeSoFar.coordinates == endCoordinates)
+            {
+                lowestRiskNode = bestNodeSoFar;
+
+                break;
+            }
 
             //Remove it
-            pathsToInvestigate.RemoveAt(0);
+            //This list is not sorted so dont remove 0!
+            nodesToInvestigate.Remove(bestNodeSoFar);
 
             //Find all nodes this path can connect to
-            List<Vector2Int> nextNodes = FindNextNodes(thisPath, rows);
+            List<Node> nextNodes = FindNextNodes(bestNodeSoFar, riskMap, visitedCells, nodesToInvestigate);
 
-            //If this path can continue
-            if (nextNodes.Count > 0)
+            //Create new paths and add them to the list of all active paths
+            //May be 0 if we didnt find any next nodes
+            foreach (Node nextNode in nextNodes)
             {
-                foreach (Vector2Int nextNode in nextNodes)
-                {
-                    //Clone the original path
-                    List<Vector2Int> newPath = new List<Vector2Int>(thisPath);
-                    //...and add the next node to the end of the path
-                    newPath.Add(nextNode);
+                nodesToInvestigate.Add(nextNode);
 
-                    //This path has reached the goal
-                    if (nextNode == endNode)
-                    {
-                        lowestRiskPath = newPath;
+                //We have now visited this node
+                visitedCells[nextNode.coordinates.x, nextNode.coordinates.y] = true;
 
-                        break;
-                    }
-                    //This path needs to be expanded further
-                    else
-                    {
-                        pathsToInvestigate.Add(newPath);
-                    }
+                //Dont check for goal node here!
 
-                    //Debug.Log(nextNode);
-                }
-
-                //break;
+                //allNewNodes.Add(nextNode);
             }
         }
 
+        //riskMap.Display();
+
+        //DisplayPath(riskMap, bestPathSoFar);
+        //DisplayPath(riskMap, allNewNodes);
+
+        //Debug.Log($"Best path so far risk: {}");
+
+        /*
+        foreach (List<Vector2Int> path in pathsToInvestigate)
+        {
+            int risk = CalculateRisk(path, riskMap);
+
+            Debug.Log(risk);
+
+            DisplayCoordinates(path);
+            
+            DisplayPath(riskMap, path);
+        }
+        */
+
+
         //Debug.Log($"Number of paths found: {allValidPaths.Count}");
 
-        int totalRisk = CalculateRisk(lowestRiskPath, riskMap);
+        //int totalRisk = CalculateRisk(lowestRiskPath, riskMap);
 
+        if (lowestRiskNode != null)
+        {
+            //List<Node> lowestRiskPath = GeneratePathFromNode(lowestRiskNode);
+        
+            //DisplayPath(riskMap, lowestRiskPath);
 
-        Debug.Log($"Total risk: {totalRisk}");
+            //Should be 589
+            Debug.Log($"Total risk: {lowestRiskNode.totalRisk}");
+        }
+        
     }
 
 
 
-    private List<Vector2Int> GetLowestRiskPath(List<List<Vector2Int>> allPaths, int[,] riskMap)
+    private class Node
     {
-        int lowestRisk = int.MaxValue;
-        List<Vector2Int> lowestRiskPath = null;
+        public Vector2Int coordinates;
 
-        foreach (List<Vector2Int> path in allPaths)
+        public int totalRisk;
+
+        public Node previousNode;
+
+        public Node(Vector2Int coordinates, int totalRisk, Node previousNode)
         {
-            int risk = CalculateRisk(path, riskMap);
+            this.coordinates = coordinates;
+            this.totalRisk = totalRisk;
+            this.previousNode = previousNode;
+        }
+    }
 
-            if (risk < lowestRisk)
+
+
+    private List<Node> GeneratePathFromNode(Node lowestRiskNode)
+    {
+        List<Node> lowestRiskPath = new List<Node>();
+
+        int safety = 0;
+
+        Node currentNode = lowestRiskNode;
+
+        while (true)
+        {
+            safety += 1;
+
+            if (safety > 1000)
             {
-                lowestRisk = risk;
+                Debug.Log("Stuck in infinite loop");
 
-                lowestRiskPath = path;
+                break;
             }
+
+            lowestRiskPath.Add(currentNode);
+
+            if (currentNode.previousNode == null)
+            {
+                break;
+            }
+
+            currentNode = currentNode.previousNode;
         }
 
         return lowestRiskPath;
@@ -156,53 +209,150 @@ public class Day_15 : MonoBehaviour
 
 
 
-    private int CalculateRisk(List<Vector2Int> path, int[,] riskMap)
+    private Node GetLowestRiskNode(HashSet<Node> allNodes)
     {
-        int totalRisk = 0;
+        int lowestRisk = int.MaxValue;
 
-        //Don't count the risk level of your starting position unless you enter it
-        for (int i = 1; i < path.Count; i++)
+        Node lowestRiskNode = null;
+
+        foreach (Node node in allNodes)
         {
-            Vector2Int node = path[i];
+            if (node.totalRisk < lowestRisk)
+            {
+                lowestRisk = node.totalRisk;
 
-            totalRisk += riskMap[node.x, node.y];
+                lowestRiskNode = node;
+            }
         }
-        
-        //Debug.Log(totalRisk);
-        
-        return totalRisk;
+
+        return lowestRiskNode;
     }
 
 
 
-    private List<Vector2Int> FindNextNodes(List<Vector2Int> path, int mapSize)
+    private List<Node> FindNextNodes(Node node, int[,] riskMap, bool[,] visitedCells, HashSet<Node> nodesToInvestigate)
     {
-        List<Vector2Int> nextNodes = new List<Vector2Int>();
-    
-        Vector2Int lastNode = path[path.Count - 1];
+        List<Node> nextNodes = new List<Node>();
 
         //The directions we can move
         Vector2Int[] directions = { new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(1, 0), new Vector2Int(0, -1) };
 
+        int mapSize = visitedCells.GetLength(0);
+
         foreach (Vector2Int dir in directions)
         {
-            Vector2Int nextNode = new Vector2Int(lastNode.x + dir.x, lastNode.y + dir.y);
+            Vector2Int nextNodesCoordinates = new Vector2Int(node.coordinates.x + dir.x, node.coordinates.y + dir.y);
 
             //Is this node outside the map?
-            if (nextNode.x < 0 || nextNode.x >= mapSize || nextNode.y < 0 || nextNode.y >= mapSize)
+            if (nextNodesCoordinates.x < 0 || nextNodesCoordinates.x >= mapSize || nextNodesCoordinates.y < 0 || nextNodesCoordinates.y >= mapSize)
             {
                 continue;
             }
 
             //Is this node already in the path?
-            if (path.Contains(nextNode))
+            if (visitedCells[nextNodesCoordinates.x, nextNodesCoordinates.y])
             {
+                //Debug.Log("This path already contains this node");
+
+                //If we have already visited this node, we have to check if the path to that node from this node is shorter
+                //Example if we have A (7) and B (2) is connected to the Start node
+                //And B is connected to A (3)
+                //Then the shorter path to A from Start is through B (2 + 3 < 7)
+                //So A's previous node should be B and not Start
+
+                //This is not needed in this case because it will never happen!
+                //Node alreadyVisited = TryFindNodeInQueue(nextNodesCoordinates, nodesToInvestigate);
+
+                //if (alreadyVisited != null)
+                //{
+                //    if (alreadyVisited.totalRisk > node 
+                //}
+
                 continue;
             }
+
+            int totalRisk = node.totalRisk + riskMap[nextNodesCoordinates.x, nextNodesCoordinates.y];
+
+            Node nextNode = new Node(nextNodesCoordinates, totalRisk, node);
 
             nextNodes.Add(nextNode);
         }
 
         return nextNodes;
+    }
+
+
+
+    private Node TryFindNodeInQueue(Vector2Int nextNodesCoordinates, HashSet<Node> nodesToInvestigate)
+    {
+        foreach (Node node in nodesToInvestigate)
+        {
+            if (node.coordinates == nextNodesCoordinates)
+            {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+
+
+    private void DisplayPath(int[,] riskMap, List<Node> path)
+    {
+        int mapSize = riskMap.GetLength(0);
+
+        //Transfer data from path to map to make it easier to display the path
+        bool[,] isPathMap = new bool[mapSize, mapSize];
+
+        foreach (Node node in path)
+        {
+            isPathMap[node.coordinates.x, node.coordinates.y] = true;
+        }
+
+
+        for (int row = 0; row < mapSize; row++)
+        {
+            string rowString = "";
+
+            for (int col = 0; col < mapSize; col++)
+            {
+                Vector2Int cellPos = new Vector2Int(row, col);
+
+                if (isPathMap[row, col])
+                {
+                    //rowString += $"<b>{riskMap[row, col]}</b>";
+                    rowString += "-";
+                }
+                else
+                {
+                    rowString += riskMap[row, col];
+                }
+                
+
+                if (col < mapSize - 1)
+                {
+                    rowString += ", ";
+                }
+            }
+
+            Debug.Log(rowString);
+        }
+
+        Debug.Log("-");
+    }
+
+
+
+    private void DisplayCoordinates(List<Vector2Int> paths)
+    {
+        string displayString = "";
+
+        foreach (Vector2Int path in paths)
+        {
+            displayString += $"({path.x}, {path.y}) ";
+        }
+
+        Debug.Log(displayString);
     }
 }
