@@ -7,6 +7,7 @@ public class Day_15 : MonoBehaviour
     
     private void Start()
     {
+        //Part 1 and part 2
         Part_1();
     }
 
@@ -14,36 +15,13 @@ public class Day_15 : MonoBehaviour
 
     private void Part_1()
     {
-        //Get the data 
-        string[] allRowsString = FileManagement.GetInputData("Day_15", "input.txt");
-
-        //100x100 with numbers 1-9
-        //Debug.Log(allRowsString.Length);
-        //Debug.Log(allRowsString[0].Length);
-
-
-        //Each number is a risk level (1-9)
-        //You start at TL (0,0) and want to got to BR
-        //You can't move diagonally
-
-        int rows = allRowsString.Length;
-        int cols = allRowsString[0].Length;
-
-        int[,] riskMap = new int[rows, cols];
-
-        for (int row = 0; row < rows; row++)
-        {
-            for (int col = 0; col < cols; col++)
-            {
-                string s = char.ToString(allRowsString[row][col]);
-
-                riskMap[row, col] = int.Parse(s);
-            }
-        }
-
+        //int[,] riskMap = GetRiskMap_Part_1();
+        int[,] riskMap = GetRiskMap_Part_2();
+        
         //riskMap.Display();
 
-        //return;
+        int rows = riskMap.GetLength(0);
+        int cols = riskMap.GetLength(1);
 
 
         //Find the path with the lowest risk (= same as finding the shortest path where risk is the g)
@@ -72,7 +50,7 @@ public class Day_15 : MonoBehaviour
         {
             safety += 1;
 
-            if (safety > 10000)
+            if (safety > 1000000)
             {
                 Debug.Log("Stuck in infinite loop");
 
@@ -149,7 +127,8 @@ public class Day_15 : MonoBehaviour
         
             //DisplayPath(riskMap, lowestRiskPath);
 
-            //Should be 589
+            //Should be 589 for Part 1
+            //Should be 2885 for Part 2
             Debug.Log($"Total risk: {lowestRiskNode.totalRisk}");
         }
         
@@ -354,5 +333,85 @@ public class Day_15 : MonoBehaviour
         }
 
         Debug.Log(displayString);
+    }
+
+
+
+    private int[,] GetRiskMap_Part_1()
+    {
+        //Get the data 
+        string[] allRowsString = FileManagement.GetInputData("Day_15", "input.txt");
+
+        //100x100 with numbers 1-9
+        //Debug.Log(allRowsString.Length);
+        //Debug.Log(allRowsString[0].Length);
+
+
+        //Each number is a risk level (1-9)
+        //You start at TL (0,0) and want to got to BR
+        //You can't move diagonally
+
+        int rows = allRowsString.Length;
+        int cols = allRowsString[0].Length;
+
+        int[,] riskMap = new int[rows, cols];
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < cols; col++)
+            {
+                string s = char.ToString(allRowsString[row][col]);
+
+                riskMap[row, col] = int.Parse(s);
+            }
+        }
+
+        return riskMap;
+    }
+
+
+
+    private int[,] GetRiskMap_Part_2()
+    {
+        int[,] riskMap_part_1 = GetRiskMap_Part_1();
+
+        int rows = riskMap_part_1.GetLength(0);
+        int cols = riskMap_part_1.GetLength(1);
+
+        //The risk map in part 2 is 5*5 the original risk map
+        int[,] riskMap = new int[rows * 5, cols * 5];
+
+        //For each row and col inbthe original map
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < cols; col++)
+            {
+                //For each section in the new map
+                for (int rowSection = 0; rowSection < 5; rowSection++)
+                {
+                    for (int colSection = 0; colSection < 5; colSection++)
+                    {
+                        int oldRisk = riskMap_part_1[row, col];
+
+                        int newRisk = oldRisk + rowSection + colSection;
+
+                        if (newRisk > 9)
+                        {
+                            newRisk = newRisk - 9;
+                        }
+
+                        int rowNew = row + (rowSection * rows);
+                        int colNew = col + (colSection * cols);
+
+                        riskMap[rowNew, colNew] = newRisk;
+                    }
+                }
+            }
+        }
+
+        //Debug.Log(riskMap[0, 0]); // 0
+        //Debug.Log(riskMap[riskMap.GetLength(0) - 1, riskMap.GetLength(1) - 2]); // 7
+
+        return riskMap;
     }
 }
