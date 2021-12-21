@@ -5,7 +5,11 @@ using UnityEngine;
 
 public class Day_16 : MonoBehaviour
 {
-    
+    private static int versionSum = 0;
+
+    private static int processPackagesSafety = 0;
+
+
     private void Start()
     {
         Part_1();
@@ -31,11 +35,6 @@ public class Day_16 : MonoBehaviour
         string[] allRowsString = FileManagement.GetInputData("Day_16", "input.txt");
 
         string input_actual = allRowsString[0];
-
-        string test_input_1 = "8A004A801A8002F478"; //16
-        string test_input_2 = "620080001611562C8802118E34"; //12
-        string test_input_3 = "C0015000016115A2E0802F182340"; //23
-        string test_input_4 = "A0016C880162017C3686B18A3D4780"; //31
 
         //Debug.Log(allRowsString.Length);
         //Debug.Log(allRowsString[0]);
@@ -81,47 +80,116 @@ public class Day_16 : MonoBehaviour
 
         //string input_test = "D2FE28"; //should output lateral value 2021
         //string input_test = "38006F45291200"; //Operator packet with mode 0
-        string input_test = "EE00D40C823060"; //Operator packet with mode 1
+        //string input_test = "EE00D40C823060"; //Operator packet with mode 1
+
+        //string input_test = "8A004A801A8002F478"; //16
+        //string input_test = "620080001611562C8802118E34"; //12 
+        string input_test = "C0015000016115A2E0802F182340"; //23
+        //string input_test = "A0016C880162017C3686B18A3D4780"; //31
+
+
+        //Example: 8A004A801A8002F478
+
+        //100 010 1 00000000001 001010100000000001101010000000000000101111010001111000
+        // Parent package: Version: 4, ID: 2 -> mode: 1 -> next 11 determines how man sub-packages: 00000000001 -> 1 sub-package
+        // Sub-package 1: 001 010 1 00000000001 101010000000000000101111010001111000
+        // Version: 1, ID: 2 -> mode: 1 -> next 11 determines how man sub-packages: -> 00000000001 -> 1 sub-package
+        // Sub-sub-package: 101 010 0 000000000001011 11010001111000
+        // Version: 5, ID: 2 -> mode: 0 -> next 15 determines the length of the string with sub-packages -> 000000000001011 -> length 11
+        // Sub-sub-sub-package: 110 100 01111 (the last three 0s were removed because we know the length is 11)
+        // Version: 6, ID: 4 -> literal value = 15
+        // Total version = 4 + 1 + 5 + 6 = 16
+
+        //Example: 620080001611562C8802118E34
+        //011 000 1 00000000010 00000000000000000101100001000101010110001011001000100000000010000100011000111000110100
+        //v: 3, ID: 0 -> mode 1 -> next 11 determines how many sub-packages: 00000000010 -> 2 sub-packages
+
+        //We know this includes two sub-packages
+        //00000000000000000101100001000101010110001011001000100000000010000100011000111000110100
+
+        //000 000 0 000000000010110 0001000101010110001011 001000100000000010000100011000111000110100
+        //Sub-package 1: v: 0, ID: 0 -> mode 0: next 15 determines the length of the string with sub-packages -> 000000000010110 -> length 22
+        //Sub-sub-sub-package from sub-package 1: 0001000101010110001011 
+        // - value 1: 000 100 01010 
+        // - value 2: 101 100 01011 
+
+        //001 000 1 00000000010 000100011000111000110100
+        //Sub-package 2: ID: 0 -> mode 1: next 11 determines how many sub-packages: 00000000010 -> 2 sub-packages
+        //Sub-sub-sub-package from sub-package 2: 
+        // - value 1: 000 100 01100 
+        // - value 2: 011 100 01101 00
+
+        // Total version: 3 + 1 + 
+
+
+        //Example C0015000016115A2E0802F182340
+        //110 000 0 000000001010100 000000000000000001011000010001010110100010111000001000000000101111000110000010001101 000000
+        //v: 6, id: 0, mode: 0 -> find the next 15 bits: 000000001010100 -> 84
+        //84 bits: 000000000000000001011000010001010110100010111000001000000000101111000110000010001101
+
+        //000 000 0 000000000010110 0001000101011010001011 1000001000000000101111000110000010001101
+        //v: 0, id: 0, mode: 0 -> find the next 15 bits: 000000000010110 = 22 
+
+        //22 bits: 
+        // - value 1: 000 100 01010 
+        // - value 2: 110 100 01011
+
+        //We still have 100 000 1 00000000010 1111000110000010001101
+        //v: 4, id: 0, mode: 1 -> find the next 11 bits: 00000000010 = 2 packages 
+        //Package 1: 
+        // - value 1: 111 100 01100 
+        // - value 2: 000 100 01101
 
         string binaryString = ConvertHexToBinary(input_test);
 
-        //Debug.Log(binary);
+        Debug.Log(binaryString);
+
+        //Assumer we cant have literal value and subpackage at the same time
+        ProcessPackage(binaryString);
 
 
-        ProcessBinaryNumber(binaryString);
+        Debug.Log($"Sum of version numbers: {versionSum}");
     }
 
 
 
-    private void ProcessBinaryNumber(string binaryString)
+    private void ProcessPackage(string binaryString)
     {
+        processPackagesSafety += 1;
+
+        if (processPackagesSafety > 10000000)
+        {
+            Debug.Log("Stuck in infinite loop when processing packages");
+
+            return;
+        }
+    
+    
         //The first 3+3 are always known
-        string version_binary = binaryString.Substring(0, 3);
-        string typeID_binary = binaryString.Substring(3, 3);
+        int version = GetVersion(binaryString);
+        int typeID = GetTypeID(binaryString);
 
-        //binary to decimal
-        int version = Convert.ToInt32(version_binary, fromBase: 2);
-        int typeID = Convert.ToInt32(typeID_binary, fromBase: 2);
+        //Debug.Log($"Version: {version}");
+        //Debug.Log($"Type ID: {typeID}");
 
-        Debug.Log($"Version: {version}");
-        Debug.Log($"Type ID: {typeID}");
+        versionSum += version;
+
+        Debug.Log(version);
 
         //Is this a literal value or do we have sub-packages
         if (typeID == 4)
         {
             int literalValue = CalculateLiteralValue(binaryString);
 
-            Debug.Log(literalValue);
+            //Debug.Log(literalValue);
         }
         //Subpackages so we have to continue to find their respective literal value
         else
         {
             //Now we are interested in the 7th number (the mode)
-            string modeString = binaryString.Substring(6, 1);
+            int mode = GetMode(binaryString);
 
-            int mode = Convert.ToInt32(modeString, fromBase: 2);
-
-            Debug.Log($"Mode: {mode}");
+            //Debug.Log($"Mode: {mode}");
 
             if (mode == 0)
             {
@@ -132,16 +200,11 @@ public class Day_16 : MonoBehaviour
 
                 int subPacketsLength = Convert.ToInt32(subPacketsLengthString, fromBase: 2);
 
-                Debug.Log($"Sub packets length: {subPacketsLength}");
+                //Debug.Log($"Sub packets length: {subPacketsLength}");
 
                 string subPackages = binaryString.Substring(7 + 15, subPacketsLength);
 
-                List<string> allSubPackages = GetSubPackages(subPackages);
-
-                foreach (string s in allSubPackages)
-                {
-                    ProcessBinaryNumber(s);
-                }
+                IdentifyAndProcessSubPackages(subPackages);
             }
             else if (mode == 1)
             {
@@ -152,27 +215,56 @@ public class Day_16 : MonoBehaviour
 
                 int numberOfSubPackages = Convert.ToInt32(numberOfSubPackagesString, fromBase: 2);
 
-                Debug.Log($"Number of sub packets: {numberOfSubPackages}");
+                //Debug.Log($"Number of sub-packages: {numberOfSubPackages}");
 
                 string subPackages = binaryString.Substring(7 + 11);
 
-                List<string> allSubPackages = GetSubPackages(subPackages, numberOfSubPackages);
-
-                foreach (string s in allSubPackages)
-                {
-                    ProcessBinaryNumber(s);
-                }
+                IdentifyAndProcessSubPackages(subPackages, numberOfSubPackages);
             }
         }
     }
 
 
-    private List<string> GetSubPackages(string subPackages, int totalSubPackages)
-    {
-        List<string> allSubPackages = new List<string>();
 
+    private int GetVersion(string binaryString)
+    {
+        string version_binary = binaryString.Substring(0, 3);
+
+        int version = Convert.ToInt32(version_binary, fromBase: 2);
+
+        return version;
+    }
+
+
+
+    private int GetTypeID(string binaryString)
+    {
+        string typeID_binary = binaryString.Substring(3, 3);
+
+        int typeID = Convert.ToInt32(typeID_binary, fromBase: 2);
+
+        return typeID;
+    }
+
+
+
+    private int GetMode(string binaryString)
+    {
+        string mode_binary = binaryString.Substring(6, 1);
+
+        int mode = Convert.ToInt32(mode_binary, fromBase: 2);
+
+        return mode;
+    }
+
+
+
+    private void IdentifyAndProcessSubPackages(string subPackages, int totalSubPackages)
+    {
         //We can assume only the parent package is using extra zeroes
         int safety = 0;
+
+        //List<string> allSubpackages = new List<string>();
 
         while (true)
         {
@@ -186,7 +278,11 @@ public class Day_16 : MonoBehaviour
             }
 
             //Value or another subpackages
-            int typeID = Convert.ToInt32(subPackages.Substring(3, 3), fromBase: 2);
+            int typeID = GetTypeID(subPackages);
+
+            int version = GetVersion(subPackages);
+
+            
 
             if (typeID == 4)
             {
@@ -194,31 +290,76 @@ public class Day_16 : MonoBehaviour
 
                 string thisPackage = subPackages.Substring(0, length);
 
-                allSubPackages.Add(thisPackage);
+                //ProcessPackage(thisPackage);
 
                 //Cut the string
                 //AAAAAAAAAAA BBBBBBBBBBBBBBBB
 
                 subPackages = subPackages.Substring(length);
+
+                ProcessPackage(thisPackage);
+            }
+            else
+            {
+                //Debug.Log(version);
+
+                //versionSum += version;
+
+                //Get the mode
+                int mode = GetMode(subPackages);
+
+                if (mode == 0)
+                {
+                    //Mode 0 means that the length that determines the length of the subpackages is 15
+                    string subPacketsLengthString = subPackages.Substring(7, 15);
+
+                    //Debug.Log(subPacketsLengthString);
+
+                    int subPackagesLength = Convert.ToInt32(subPacketsLengthString, fromBase: 2);
+
+                    //Debug.Log($"Sub packets length: {subPacketsLength}");
+
+                    subPackages = subPackages.Substring(7 + 15, subPackagesLength);
+
+                    IdentifyAndProcessSubPackages((string)subPackages.Clone());
+
+                    //allSubpackages.Add((string)subPackages.Clone());
+                }
+                else if (mode == 1)
+                {
+                    //Mode 1 means that the length that determines the length of the subpackages is 11
+                    string numberOfSubPackagesString = subPackages.Substring(7, 11);
+
+                    //Debug.Log(numberOfSubPackagesString);
+
+                    int numberOfSubPackages = Convert.ToInt32(numberOfSubPackagesString, fromBase: 2);
+
+                    //Debug.Log($"Number of sub-packages: {numberOfSubPackages}");
+
+                    subPackages = subPackages.Substring(7 + 11);
+
+                    IdentifyAndProcessSubPackages((string)subPackages.Clone(), numberOfSubPackages);
+                    //allSubpackages.Add((string)subPackages.Clone());
+                }
             }
 
 
-            if (allSubPackages.Count == totalSubPackages)
+            if (safety == totalSubPackages)
             {
                 break;
             }
         }
 
 
-        return allSubPackages;
+        //foreach (string s in allSubpackages)
+        //{
+        //    ProcessPackage(s);
+        //}
     }
 
 
-    private List<string> GetSubPackages(string subPackages)
+    private void IdentifyAndProcessSubPackages(string subPackages)
     {
-        List<string> allSubPackages = new List<string>();
-
-        //We can assume only the parent package is using extra zeroes
         int safety = 0;
 
         while (true)
@@ -233,7 +374,13 @@ public class Day_16 : MonoBehaviour
             }
 
             //Value or another subpackages
-            int typeID = Convert.ToInt32(subPackages.Substring(3, 3), fromBase: 2);
+            int typeID = GetTypeID(subPackages);
+
+            int version = GetVersion(subPackages);
+
+            //Debug.Log(version);
+
+            versionSum += version;
 
             if (typeID == 4)
             {
@@ -241,23 +388,61 @@ public class Day_16 : MonoBehaviour
 
                 string thisPackage = subPackages.Substring(0, length);
 
-                allSubPackages.Add(thisPackage);
+                ProcessPackage(thisPackage);
 
                 //Cut the string
                 //AAAAAAAAAAA BBBBBBBBBBBBBBBB
 
                 subPackages = subPackages.Substring(length);
             }
+            else
+            {
+                //Debug.Log(version);
+
+                //versionSum += version;
+
+                //Get the mode
+                int mode = GetMode(subPackages);
+
+                if (mode == 0)
+                {
+                    //Mode 0 means that the length that determines the length of the subpackages is 15
+                    string subPacketsLengthString = subPackages.Substring(7, 15);
+
+                    //Debug.Log(subPacketsLengthString);
+
+                    int subPacketsLength = Convert.ToInt32(subPacketsLengthString, fromBase: 2);
+
+                    //Debug.Log($"Sub packets length: {subPacketsLength}");
+
+                    subPackages = subPackages.Substring(7 + 15, subPacketsLength);
+
+                    IdentifyAndProcessSubPackages((string)subPackages.Clone());
+                }
+                else if (mode == 1)
+                {
+                    //Mode 1 means that the length that determines the length of the subpackages is 11
+                    string numberOfSubPackagesString = subPackages.Substring(7, 11);
+
+                    //Debug.Log(numberOfSubPackagesString);
+
+                    int numberOfSubPackages = Convert.ToInt32(numberOfSubPackagesString, fromBase: 2);
+
+                    //Debug.Log($"Number of sub-packages: {numberOfSubPackages}");
+
+                    subPackages = subPackages.Substring(7 + 11);
+
+                    IdentifyAndProcessSubPackages((string)subPackages.Clone(), numberOfSubPackages);
+                }
+            }
 
 
+            //This is not always true because we may have trailing 0s, or are we removing those before we get here?????
             if (subPackages.Length == 0)
             {
                 break;
             }
         }
-        
-
-        return allSubPackages;
     }
 
 
