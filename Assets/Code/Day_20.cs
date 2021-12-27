@@ -11,7 +11,7 @@ public class Day_20 : MonoBehaviour
         Part_1();
     }
 
-    
+
 
     private void Part_1()
     {
@@ -21,8 +21,12 @@ public class Day_20 : MonoBehaviour
         //The image is actually of infinite size, so we need to add padding with dark pixels (.)
         //DisplayImage(image);
 
-        int padding = 5;
-        
+        //Debug.Log(image[4, 0]);
+        //Debug.Log(image[4, 1]);
+        //Debug.Log(image[4, 2]);
+
+        int padding = 10;
+
         int size = image.GetLength(0);
 
         int paddedImageSize = (padding * 2) + size;
@@ -44,27 +48,35 @@ public class Day_20 : MonoBehaviour
         //Debug.Log(imageEnhancementAlgorithm[Convert.ToInt32("000100010", fromBase: 2)]);
         //Debug.Log(imageEnhancementAlgorithm.Length);
 
+        //row, col
+        //Debug.Log(paddedImage[7, 3]);
+        //Debug.Log(paddedImage[7, 4]);
+        //Debug.Log(paddedImage[7, 5]);
+        //Debug.Log(paddedImage[7, 6]);
 
         //Enhance the image
         char[,] paddedImageBuffer = GetEmptyImage(paddedImageSize);
 
         //The directions we can move
         //These have to be sorted wo we get the pixels row-by-row to be able to convert to a binary number
-        // (-1,  1) (0,  1) (1,  1)
-        // (-1,  0) (0,  0) (1,  0)
-        // (-1, -1) (0, -1) (1, -1)
+        //Row, col
+        // (-1, -1) (-1,  0) (-1,  1)
+        // ( 0, -1) ( 0,  0) ( 0,  1)
+        // ( 1, -1) ( 1,  0) ( 1,  1)
+
         Vector2Int[] directions = {
-            new Vector2Int(-1,  1),
-            new Vector2Int( 0,  1),
-            new Vector2Int( 1,  1),
-
-            new Vector2Int(-1,  0),
-            new Vector2Int( 0,  0),
-            new Vector2Int( 1,  0),
-
+            //Upper row first!
             new Vector2Int(-1, -1),
+            new Vector2Int(-1,  0),
+            new Vector2Int(-1,  1),
+
             new Vector2Int( 0, -1),
-            new Vector2Int( 1, -1)
+            new Vector2Int( 0,  0),
+            new Vector2Int( 0,  1),
+
+            new Vector2Int( 1, -1),
+            new Vector2Int( 1,  0),
+            new Vector2Int( 1,  1)
         };
 
         int STEPS = 1;
@@ -73,20 +85,25 @@ public class Day_20 : MonoBehaviour
         {
 
             //Ignore the outer row/column because they shouldnt change
-            for (int i = 1; i < paddedImageSize - 1; i++)
+            for (int row = 1; row < paddedImageSize - 1; row++)
             {
-                for (int j = 1; j < paddedImageSize - 1; j++)
+                for (int col = 1; col < paddedImageSize - 1; col++)
                 {
                     string binaryString = "";
 
                     //Get the 9 cells 
                     foreach (Vector2Int dir in directions)
                     {
-                        Vector2Int cellPos = new Vector2Int(i + dir.x, j + dir.y);
+                        Vector2Int cellPos = new Vector2Int(row + dir.x, col + dir.y);
 
                         char c = paddedImage[cellPos.x, cellPos.y];
 
                         binaryString += (c == '.') ? '0' : '1';
+
+                        //if (row == 7 && col == 7)
+                        //{
+                        //    Debug.Log(c);
+                        //}
                     }
 
                     //When this cell is done, we have to find which character to put in its place
@@ -95,7 +112,14 @@ public class Day_20 : MonoBehaviour
                     //Find the corresponding char in imageEnhancementAlgorithm string
                     char correspondingChar = imageEnhancementAlgorithm[decimalNumber];
 
-                    paddedImageBuffer[i, j] = correspondingChar;
+                    paddedImageBuffer[row, col] = correspondingChar;
+
+                    //if (row == 7 && col == 7)
+                    //{
+                    //    Debug.Log(binaryString);
+
+                    //    Debug.Log(correspondingChar);
+                    //}
                 }
             }
 
@@ -109,6 +133,27 @@ public class Day_20 : MonoBehaviour
 
 
         DisplayImage(paddedImage);
+
+        //Count number of lit pixels in the final image = count the number 0f #
+
+        int counter = 0;
+
+        for (int row = 1; row < paddedImageSize - 1; row++)
+        {
+            for (int col = 1; col < paddedImageSize - 1; col++)
+            {
+                char c = paddedImage[row, col];
+                
+                if (c == '#')
+                {
+                    counter += 1;
+                }
+            }
+        }
+
+
+        //Smaller than 5302
+        Debug.Log($"Number of lit pixels: {counter}");
     }
 
 
@@ -133,7 +178,7 @@ public class Day_20 : MonoBehaviour
     private void GetData(out string imageEnhancementAlgorithm, out char[,] image)
     {
         //Get the data 
-        string[] allRowsString = FileManagement.GetInputData("Day_20", "input_test.txt");
+        string[] allRowsString = FileManagement.GetInputData("Day_20", "input.txt");
 
         //First row is the image enhancement algorithm 
         //Then there's a space
@@ -181,7 +226,7 @@ public class Day_20 : MonoBehaviour
                 char c = image[i, j];
 
                 //Easier to see the map if we display - instead of .
-                display += (c == '.') ? '-' : '#';
+                display += (c == '.') ? ", " : "-";
             }
 
             Debug.Log(display);
