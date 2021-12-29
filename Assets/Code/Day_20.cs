@@ -25,23 +25,11 @@ public class Day_20 : MonoBehaviour
         //Debug.Log(image[4, 1]);
         //Debug.Log(image[4, 2]);
 
-        int padding = 10;
-
-        int size = image.GetLength(0);
-
-        int paddedImageSize = (padding * 2) + size;
-
-        char[,] paddedImage = GetEmptyImage(paddedImageSize);
-
-        for (int i = padding; i < padding + size; i++)
-        {
-            for (int j = padding; j < padding + size; j++)
-            {
-                paddedImage[i, j] = image[i - padding, j - padding];
-            }
-        }
+        //char[,] paddedImage = AddPaddingToImage(image, padding: 1);
 
         //DisplayImage(paddedImage);
+        //return;
+        
 
         //Test conversion and lookup
         //Debug.Log(Convert.ToInt32("000100010", fromBase: 2));
@@ -55,7 +43,6 @@ public class Day_20 : MonoBehaviour
         //Debug.Log(paddedImage[7, 6]);
 
         //Enhance the image
-        char[,] paddedImageBuffer = GetEmptyImage(paddedImageSize);
 
         //The directions we can move
         //These have to be sorted wo we get the pixels row-by-row to be able to convert to a binary number
@@ -79,15 +66,29 @@ public class Day_20 : MonoBehaviour
             new Vector2Int( 1,  1)
         };
 
-        int STEPS = 1;
+        int STEPS = 2;
 
         for (int step = 0; step < STEPS; step++)
         {
-
-            //Ignore the outer row/column because they shouldnt change
-            for (int row = 1; row < paddedImageSize - 1; row++)
+            //Add a 1 cell border to the image
+            if (step % 2 != 0)
             {
-                for (int col = 1; col < paddedImageSize - 1; col++)
+                image = AddPaddingToImage(image, padding: 1, paddingCharacter: '#');
+            }
+            else
+            {
+                image = AddPaddingToImage(image, padding: 1, paddingCharacter: '.');
+            }
+
+            
+
+            int imageSize = image.GetLength(0);
+
+            char[,] imageBuffer = GetEmptyImage(imageSize, defaultCharacter: '.');
+
+            for (int row = 0; row < imageSize; row++)
+            {
+                for (int col = 0; col < imageSize; col++)
                 {
                     string binaryString = "";
 
@@ -96,7 +97,23 @@ public class Day_20 : MonoBehaviour
                     {
                         Vector2Int cellPos = new Vector2Int(row + dir.x, col + dir.y);
 
-                        char c = paddedImage[cellPos.x, cellPos.y];
+                        char c = '.'; //Just default
+                        
+                        //If we are outside of the image then we have dark (.) cells
+                        if (cellPos.x < 0 || cellPos.x >= imageSize || cellPos.y < 0 || cellPos.y >= imageSize)
+                        {
+                            c = '.';
+
+                            //Unven numbers means we have to swap
+                            if (step % 2 != 0)
+                            {
+                                c = '#';
+                            }
+                        }
+                        else
+                        {
+                            c = image[cellPos.x, cellPos.y];
+                        }
 
                         binaryString += (c == '.') ? '0' : '1';
 
@@ -112,7 +129,7 @@ public class Day_20 : MonoBehaviour
                     //Find the corresponding char in imageEnhancementAlgorithm string
                     char correspondingChar = imageEnhancementAlgorithm[decimalNumber];
 
-                    paddedImageBuffer[row, col] = correspondingChar;
+                    imageBuffer[row, col] = correspondingChar;
 
                     //if (row == 7 && col == 7)
                     //{
@@ -123,26 +140,27 @@ public class Day_20 : MonoBehaviour
                 }
             }
 
-            //Swap buffers
-            paddedImage = paddedImageBuffer;
+            //Swap with the buffer
+            image = imageBuffer;
 
-            //Reset buffer for next loop
-            paddedImageBuffer = GetEmptyImage(paddedImageSize);
+            //DisplayImage(image);
         }
 
 
 
-        DisplayImage(paddedImage);
+        DisplayImage(image);
 
         //Count number of lit pixels in the final image = count the number 0f #
 
         int counter = 0;
 
-        for (int row = 1; row < paddedImageSize - 1; row++)
+        int finalImageSize = image.GetLength(0);
+
+        for (int row = 0; row < finalImageSize; row++)
         {
-            for (int col = 1; col < paddedImageSize - 1; col++)
+            for (int col = 0; col < finalImageSize; col++)
             {
-                char c = paddedImage[row, col];
+                char c = image[row, col];
                 
                 if (c == '#')
                 {
@@ -152,13 +170,34 @@ public class Day_20 : MonoBehaviour
         }
 
 
-        //Smaller than 5302
+        //Should be 5301
         Debug.Log($"Number of lit pixels: {counter}");
     }
 
 
 
-    private char[,] GetEmptyImage(int size)
+    private char[,] AddPaddingToImage(char[,] image, int padding, char paddingCharacter)
+    {
+        int size = image.GetLength(0);
+
+        int paddedImageSize = (padding * 2) + size;
+
+        char[,] paddedImage = GetEmptyImage(paddedImageSize, paddingCharacter);
+
+        for (int i = padding; i < padding + size; i++)
+        {
+            for (int j = padding; j < padding + size; j++)
+            {
+                paddedImage[i, j] = image[i - padding, j - padding];
+            }
+        }
+
+        return paddedImage;
+    }
+
+
+
+    private char[,] GetEmptyImage(int size, char defaultCharacter)
     {
         char[,] paddedImage = new char[size, size];
 
@@ -166,7 +205,7 @@ public class Day_20 : MonoBehaviour
         {
             for (int j = 0; j < size; j++)
             {
-                paddedImage[i, j] = '.';
+                paddedImage[i, j] = defaultCharacter;
             }
         }
 
