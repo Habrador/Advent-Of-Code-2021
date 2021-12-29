@@ -8,6 +8,7 @@ public class Day_20 : MonoBehaviour
     
     private void Start()
     {
+        //Also includes part 2
         Part_1();
     }
 
@@ -66,7 +67,7 @@ public class Day_20 : MonoBehaviour
             new Vector2Int( 1,  1)
         };
 
-        int STEPS = 2;
+        int STEPS = 50;
 
         for (int step = 0; step < STEPS; step++)
         {
