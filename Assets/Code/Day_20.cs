@@ -71,6 +71,7 @@ public class Day_20 : MonoBehaviour
         for (int step = 0; step < STEPS; step++)
         {
             //Add a 1 cell border to the image
+            //Because our 0 in the imageEnhancementAlgorithm is (#), then all infinite characters that started as (.) will swap every round
             if (step % 2 != 0)
             {
                 image = AddPaddingToImage(image, padding: 1, paddingCharacter: '#');
@@ -116,11 +117,6 @@ public class Day_20 : MonoBehaviour
                         }
 
                         binaryString += (c == '.') ? '0' : '1';
-
-                        //if (row == 7 && col == 7)
-                        //{
-                        //    Debug.Log(c);
-                        //}
                     }
 
                     //When this cell is done, we have to find which character to put in its place
@@ -130,13 +126,6 @@ public class Day_20 : MonoBehaviour
                     char correspondingChar = imageEnhancementAlgorithm[decimalNumber];
 
                     imageBuffer[row, col] = correspondingChar;
-
-                    //if (row == 7 && col == 7)
-                    //{
-                    //    Debug.Log(binaryString);
-
-                    //    Debug.Log(correspondingChar);
-                    //}
                 }
             }
 
@@ -148,7 +137,7 @@ public class Day_20 : MonoBehaviour
 
 
 
-        DisplayImage(image);
+        //DisplayImage(image);
 
         //Count number of lit pixels in the final image = count the number 0f #
 
