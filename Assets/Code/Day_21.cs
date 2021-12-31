@@ -159,8 +159,14 @@ public class Day_21 : MonoBehaviour
 
 
 
+        //We need some kind of tree structure because using a recursive methods will not work because we want to generate all possible outcomes, not first possible best outcome.   
+
+        //Or if we know how many universes we for a player to win, such as 5, by using recursive, then we should be able to calculate how big the tree is if we know its depth is 5??? Or maybe that first solution is wrong and another part of the tree could have generated a better solution!
+
+        //We could also use a max-levels-expanded while keeping track of the min number of universes until we hit a goal
+
         //The dice is has 3 sides: 1, 2, 3
-        PlayGame(player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
+        PlayGame(player_1_pos, player_2_pos, player_1_score, player_2_score);
 
 
 
@@ -185,14 +191,14 @@ public class Day_21 : MonoBehaviour
 
 
 
-    private void MovePlayers(int diceValue_player_1, int diceValue_player_2, int player_1_pos, int player_2_pos, int player_1_score, int player_2_score, long numberOfUniverses)
+    private void MovePlayers(int diceValue_player_1, int diceValue_player_2, int player_1_pos, int player_2_pos, int player_1_score, int player_2_score)
     {
         if (isGameFinished)
         {
             return;
         }
-    
-    
+
+
         numberOfUniverses += 1;
 
         if (numberOfUniverses > 544356092776315)
@@ -211,13 +217,15 @@ public class Day_21 : MonoBehaviour
 
         player_1_score += player_1_pos;
 
+        //Debug.Log($"Player 1 score: {player_1_score}, Pos: {player_1_pos}");
+
         if (player_1_score >= 27)
         {
             Debug.Log("Player 1 is the winner");
 
             Debug.Log($"Number of Universes: {numberOfUniverses}");
 
-            isGameFinished = true;
+            //isGameFinished = true;
 
             return;
         }
@@ -237,32 +245,32 @@ public class Day_21 : MonoBehaviour
 
             Debug.Log($"Number of Universes: {numberOfUniverses}");
 
-            isGameFinished = true;
+            //isGameFinished = true;
 
             return;
         }
 
 
         //Create a new universe
-        PlayGame(player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
+        PlayGame(player_1_pos, player_2_pos, player_1_score, player_2_score);
     }
 
 
-    private void PlayGame(int player_1_pos, int player_2_pos, int player_1_score, int player_2_score, long numberOfUniverses)
+    private void PlayGame(int player_1_pos, int player_2_pos, int player_1_score, int player_2_score)
     {
         //The dice is has 3 sides: 1, 2, 3
 
-        MovePlayers(diceValue_player_1: 1, diceValue_player_2: 1, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
-        MovePlayers(diceValue_player_1: 1, diceValue_player_2: 2, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
-        MovePlayers(diceValue_player_1: 1, diceValue_player_2: 3, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
+        MovePlayers(diceValue_player_1: 1, diceValue_player_2: 1, player_1_pos, player_2_pos, player_1_score, player_2_score);
+        MovePlayers(diceValue_player_1: 1, diceValue_player_2: 2, player_1_pos, player_2_pos, player_1_score, player_2_score);
+        MovePlayers(diceValue_player_1: 1, diceValue_player_2: 3, player_1_pos, player_2_pos, player_1_score, player_2_score);
 
-        MovePlayers(diceValue_player_1: 2, diceValue_player_2: 1, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
-        MovePlayers(diceValue_player_1: 2, diceValue_player_2: 2, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
-        MovePlayers(diceValue_player_1: 2, diceValue_player_2: 3, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
+        MovePlayers(diceValue_player_1: 2, diceValue_player_2: 1, player_1_pos, player_2_pos, player_1_score, player_2_score);
+        MovePlayers(diceValue_player_1: 2, diceValue_player_2: 2, player_1_pos, player_2_pos, player_1_score, player_2_score);
+        MovePlayers(diceValue_player_1: 2, diceValue_player_2: 3, player_1_pos, player_2_pos, player_1_score, player_2_score);
 
-        MovePlayers(diceValue_player_1: 3, diceValue_player_2: 1, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
-        MovePlayers(diceValue_player_1: 3, diceValue_player_2: 2, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
-        MovePlayers(diceValue_player_1: 3, diceValue_player_2: 3, player_1_pos, player_2_pos, player_1_score, player_2_score, numberOfUniverses);
+        MovePlayers(diceValue_player_1: 3, diceValue_player_2: 1, player_1_pos, player_2_pos, player_1_score, player_2_score);
+        MovePlayers(diceValue_player_1: 3, diceValue_player_2: 2, player_1_pos, player_2_pos, player_1_score, player_2_score);
+        MovePlayers(diceValue_player_1: 3, diceValue_player_2: 3, player_1_pos, player_2_pos, player_1_score, player_2_score);
     }
 
 
