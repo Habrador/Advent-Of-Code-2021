@@ -51,6 +51,10 @@ public class Day_24 : MonoBehaviour
                 {
                     Div(a, b, ref x, ref y, ref z, ref w);
                 }
+                else if (operation == "mod")
+                {
+                    Mod(a, b, ref x, ref y, ref z, ref w);
+                }
             }
             
             
@@ -286,6 +290,12 @@ public class Day_24 : MonoBehaviour
     {
         if (int.TryParse(bString, out int result))
         {
+            //Make sure no division by 0
+            if (result == 0)
+            {
+                return;
+            }
+        
             if (a == 'x')
             {
                 x = (int)Math.Truncate((double)x / (double)result);
@@ -310,71 +320,255 @@ public class Day_24 : MonoBehaviour
             //x
             if (a == 'x' && b == 'x')
             {
+                if (x == 0) return;
+            
                 x = (int)Math.Truncate((double)x / (double)x);
             }
             else if (a == 'x' && b == 'y')
             {
+                if (y == 0) return;
+
                 x = (int)Math.Truncate((double)x / (double)y);
             }
             else if (a == 'x' && b == 'z')
             {
+                if (z == 0) return;
+
                 x = (int)Math.Truncate((double)x / (double)z);
             }
             else if (a == 'x' && b == 'w')
             {
+                if (w == 0) return;
+
                 x = (int)Math.Truncate((double)x / (double)w);
             }
             //y
             else if (a == 'y' && b == 'x')
             {
+                if (x == 0) return;
+
                 y = (int)Math.Truncate((double)y / (double)x);
             }
             else if (a == 'y' && b == 'y')
             {
+                if (y == 0) return;
+
                 y = (int)Math.Truncate((double)y / (double)y);
             }
             else if (a == 'y' && b == 'z')
             {
+                if (z == 0) return;
+
                 y = (int)Math.Truncate((double)y / (double)z);
             }
             else if (a == 'y' && b == 'w')
             {
+                if (w == 0) return;
+
                 y = (int)Math.Truncate((double)y / (double)w);
             }
             //z
             else if (a == 'z' && b == 'x')
             {
+                if (x == 0) return;
+
                 z = (int)Math.Truncate((double)z / (double)x);
             }
             else if (a == 'z' && b == 'y')
             {
+                if (y == 0) return;
+
                 z = (int)Math.Truncate((double)z / (double)y);
             }
             else if (a == 'z' && b == 'z')
             {
+                if (z == 0) return;
+
                 z = (int)Math.Truncate((double)z / (double)z);
             }
             else if (a == 'z' && b == 'w')
             {
+                if (w == 0) return;
+
                 z = (int)Math.Truncate((double)z / (double)w);
             }
             //w
             else if (a == 'w' && b == 'x')
             {
+                if (x == 0) return;
+
                 w = (int)Math.Truncate((double)w / (double)x);
             }
             else if (a == 'w' && b == 'y')
             {
+                if (y == 0) return;
+
                 w = (int)Math.Truncate((double)w / (double)y);
             }
             else if (a == 'w' && b == 'z')
             {
+                if (z == 0) return;
+
                 w = (int)Math.Truncate((double)w / (double)z);
             }
             else if (a == 'w' && b == 'w')
             {
+                if (w == 0) return;
+
                 w = (int)Math.Truncate((double)w / (double)w);
             }
         }
     }
+
+
+
+    private void Mod(char a, string bString, ref int x, ref int y, ref int z, ref int w)
+    {
+        if (int.TryParse(bString, out int result))
+        {
+            //5 % 3 = 2 because 3 fits in 5 once and whats left is the 2
+
+            //Make sure a < 0 and b <= 0 will not happen
+
+            if (result <= 0)
+            {
+                return;
+            }
+
+            if (a == 'x')
+            {
+                if (x < 0) return;
+            
+                x = x % result;
+            }
+            else if (a == 'y')
+            {
+                if (y < 0) return;
+
+                y = y % result;
+            }
+            else if (a == 'z')
+            {
+                if (z < 0) return;
+
+                z = z % result;
+            }
+            else if (a == 'w')
+            {
+                if (w < 0) return;
+
+                w = w % result;
+            }
+        }
+        else
+        {
+            char b = char.Parse(bString);
+
+            //x
+            if (a == 'x' && b == 'x')
+            {
+                if (x < 0 || x <= 0) return;
+            
+                x = x % x;
+            }
+            else if (a == 'x' && b == 'y')
+            {
+                if (x < 0 || y <= 0) return;
+
+                x = x % y;
+            }
+            else if (a == 'x' && b == 'z')
+            {
+                if (x < 0 || z <= 0) return;
+
+                x = x % z;
+            }
+            else if (a == 'x' && b == 'w')
+            {
+                if (x < 0 || w <= 0) return;
+
+                x = x % w;
+            }
+            //y
+            else if (a == 'y' && b == 'x')
+            {
+                if (y < 0 || x <= 0) return;
+
+                y = y % x;
+            }
+            else if (a == 'y' && b == 'y')
+            {
+                if (y < 0 || y <= 0) return;
+
+                y = y % y;
+            }
+            else if (a == 'y' && b == 'z')
+            {
+                if (y < 0 || z <= 0) return;
+
+                y = y % z;
+            }
+            else if (a == 'y' && b == 'w')
+            {
+                if (y < 0 || w <= 0) return;
+
+                y = y % w;
+            }
+            //z
+            else if (a == 'z' && b == 'x')
+            {
+                if (z < 0 || x <= 0) return;
+
+                z = z % x;
+            }
+            else if (a == 'z' && b == 'y')
+            {
+                if (z < 0 || y <= 0) return;
+
+                z = z % y;
+            }
+            else if (a == 'z' && b == 'z')
+            {
+                if (z < 0 || z <= 0) return;
+
+                z = z % z;
+            }
+            else if (a == 'z' && b == 'w')
+            {
+                if (z < 0 || w <= 0) return;
+
+                z = z % w;
+            }
+            //w
+            else if (a == 'w' && b == 'x')
+            {
+                if (w < 0 || x <= 0) return;
+
+                w = w % x;
+            }
+            else if (a == 'w' && b == 'y')
+            {
+                if (w < 0 || y <= 0) return;
+
+                w = w % y;
+            }
+            else if (a == 'w' && b == 'z')
+            {
+                if (w < 0 || z <= 0) return;
+
+                w = w % z;
+            }
+            else if (a == 'w' && b == 'w')
+            {
+                if (w < 0 || w <= 0) return;
+
+                w = w % w;
+            }
+        }
+        
+    }
+
+
+
 }
+
