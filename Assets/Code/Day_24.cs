@@ -39,27 +39,10 @@ public class Day_24 : MonoBehaviour
                 //b can be either variable or number
                 string b = instruction.Substring(6, 1);
 
-                if (operation == "add")
-                {
-                    Add(a, b, ref x, ref y, ref z, ref w);
-                }
-                else if (operation == "mul")
-                {
-                    Mul(a, b, ref x, ref y, ref z, ref w);
-                }
-                else if (operation == "mul")
-                {
-                    Div(a, b, ref x, ref y, ref z, ref w);
-                }
-                else if (operation == "mod")
-                {
-                    Mod(a, b, ref x, ref y, ref z, ref w);
-                }
+                //Now we need to figure out if a, b are x, y, z, w
+                Find_a_b_then_do_math(a, b, operation, ref x, ref y, ref z, ref w);
             }
-            
-            
         }
-
     }
 
 
@@ -89,26 +72,27 @@ public class Day_24 : MonoBehaviour
     //z number
     //w number
 
-
-    private void Add(char a, string bString, ref int x, ref int y, ref int z, ref int w)
+    private void Find_a_b_then_do_math(char a, string bString, string operation, ref int x, ref int y, ref int z, ref int w)
     {
         if (int.TryParse(bString, out int result))
         {
+            int b = result;
+
             if (a == 'x')
             {
-                x += result;
+                DoMath(ref x, b, operation);
             }
             else if (a == 'y')
             {
-                y += result;
+                DoMath(ref y, b, operation);
             }
             else if (a == 'z')
             {
-                z += result;
+                DoMath(ref z, b, operation);
             }
             else if (a == 'w')
             {
-                w += result;
+                DoMath(ref w, b, operation);
             }
         }
         else
@@ -118,457 +102,137 @@ public class Day_24 : MonoBehaviour
             //x
             if (a == 'x' && b == 'x')
             {
-                x += x;
+                DoMath(ref x, x, operation);
             }
             else if (a == 'x' && b == 'y')
             {
-                x += y;
+                DoMath(ref x, y, operation);
             }
             else if (a == 'x' && b == 'z')
             {
-                x += z;
+                DoMath(ref x, z, operation);
             }
             else if (a == 'x' && b == 'w')
             {
-                x += w;
+                DoMath(ref x, w, operation);
             }
             //y
             else if (a == 'y' && b == 'x')
             {
-                y += x;
+                DoMath(ref y, x, operation);
             }
             else if (a == 'y' && b == 'y')
             {
-                y += y;
+                DoMath(ref y, y, operation);
             }
             else if (a == 'y' && b == 'z')
             {
-                y += z;
+                DoMath(ref y, z, operation);
             }
             else if (a == 'y' && b == 'w')
             {
-                y += w;
+                DoMath(ref y, w, operation);
             }
             //z
             else if (a == 'z' && b == 'x')
             {
-                z += x;
+                DoMath(ref z, x, operation);
             }
             else if (a == 'z' && b == 'y')
             {
-                z += y;
+                DoMath(ref z, y, operation);
             }
             else if (a == 'z' && b == 'z')
             {
-                z += z;
+                DoMath(ref z, z, operation);
             }
             else if (a == 'z' && b == 'w')
             {
-                z += w;
+                DoMath(ref z, w, operation);
             }
             //w
             else if (a == 'w' && b == 'x')
             {
-                w += x;
+                DoMath(ref w, x, operation);
             }
             else if (a == 'w' && b == 'y')
             {
-                w += y;
+                DoMath(ref w, y, operation);
             }
             else if (a == 'w' && b == 'z')
             {
-                w += z;
+                DoMath(ref w, z, operation);
             }
             else if (a == 'w' && b == 'w')
             {
-                w += w;
+                DoMath(ref w, w, operation);
             }
         }
     }
 
 
 
-    private void Mul(char a, string bString, ref int x, ref int y, ref int z, ref int w)
+    private void DoMath(ref int a, int b, string operation)
     {
-        if (int.TryParse(bString, out int result))
+        if (operation == "add")
         {
-            if (a == 'x')
-            {
-                x *= result;
-            }
-            else if (a == 'y')
-            {
-                y *= result;
-            }
-            else if (a == 'z')
-            {
-                z *= result;
-            }
-            else if (a == 'w')
-            {
-                w *= result;
-            }
+            Add(ref a, b);
         }
-        else
+        else if (operation == "mul")
         {
-            char b = char.Parse(bString);
-
-            //x
-            if (a == 'x' && b == 'x')
-            {
-                x *= x;
-            }
-            else if (a == 'x' && b == 'y')
-            {
-                x *= y;
-            }
-            else if (a == 'x' && b == 'z')
-            {
-                x *= z;
-            }
-            else if (a == 'x' && b == 'w')
-            {
-                x *= w;
-            }
-            //y
-            else if (a == 'y' && b == 'x')
-            {
-                y *= x;
-            }
-            else if (a == 'y' && b == 'y')
-            {
-                y *= y;
-            }
-            else if (a == 'y' && b == 'z')
-            {
-                y *= z;
-            }
-            else if (a == 'y' && b == 'w')
-            {
-                y *= w;
-            }
-            //z
-            else if (a == 'z' && b == 'x')
-            {
-                z *= x;
-            }
-            else if (a == 'z' && b == 'y')
-            {
-                z *= y;
-            }
-            else if (a == 'z' && b == 'z')
-            {
-                z *= z;
-            }
-            else if (a == 'z' && b == 'w')
-            {
-                z *= w;
-            }
-            //w
-            else if (a == 'w' && b == 'x')
-            {
-                w *= x;
-            }
-            else if (a == 'w' && b == 'y')
-            {
-                w *= y;
-            }
-            else if (a == 'w' && b == 'z')
-            {
-                w *= z;
-            }
-            else if (a == 'w' && b == 'w')
-            {
-                w *= w;
-            }
+            Mul(ref a, b);
+        }
+        else if (operation == "mul")
+        {
+            Div(ref a, b);
+        }
+        else if (operation == "mod")
+        {
+            Mod(ref a, b);
         }
     }
 
 
 
-    private void Div(char a, string bString, ref int x, ref int y, ref int z, ref int w)
+    private void Add(ref int a, int b)
     {
-        if (int.TryParse(bString, out int result))
-        {
-            //Make sure no division by 0
-            if (result == 0)
-            {
-                return;
-            }
-        
-            if (a == 'x')
-            {
-                x = (int)Math.Truncate((double)x / (double)result);
-            }
-            else if (a == 'y')
-            {
-                y = (int)Math.Truncate((double)y / (double)result);
-            }
-            else if (a == 'z')
-            {
-                z = (int)Math.Truncate((double)z / (double)result);
-            }
-            else if (a == 'w')
-            {
-                w = (int)Math.Truncate((double)w / (double)result);
-            }
-        }
-        else
-        {
-            char b = char.Parse(bString);
-
-            //x
-            if (a == 'x' && b == 'x')
-            {
-                if (x == 0) return;
-            
-                x = (int)Math.Truncate((double)x / (double)x);
-            }
-            else if (a == 'x' && b == 'y')
-            {
-                if (y == 0) return;
-
-                x = (int)Math.Truncate((double)x / (double)y);
-            }
-            else if (a == 'x' && b == 'z')
-            {
-                if (z == 0) return;
-
-                x = (int)Math.Truncate((double)x / (double)z);
-            }
-            else if (a == 'x' && b == 'w')
-            {
-                if (w == 0) return;
-
-                x = (int)Math.Truncate((double)x / (double)w);
-            }
-            //y
-            else if (a == 'y' && b == 'x')
-            {
-                if (x == 0) return;
-
-                y = (int)Math.Truncate((double)y / (double)x);
-            }
-            else if (a == 'y' && b == 'y')
-            {
-                if (y == 0) return;
-
-                y = (int)Math.Truncate((double)y / (double)y);
-            }
-            else if (a == 'y' && b == 'z')
-            {
-                if (z == 0) return;
-
-                y = (int)Math.Truncate((double)y / (double)z);
-            }
-            else if (a == 'y' && b == 'w')
-            {
-                if (w == 0) return;
-
-                y = (int)Math.Truncate((double)y / (double)w);
-            }
-            //z
-            else if (a == 'z' && b == 'x')
-            {
-                if (x == 0) return;
-
-                z = (int)Math.Truncate((double)z / (double)x);
-            }
-            else if (a == 'z' && b == 'y')
-            {
-                if (y == 0) return;
-
-                z = (int)Math.Truncate((double)z / (double)y);
-            }
-            else if (a == 'z' && b == 'z')
-            {
-                if (z == 0) return;
-
-                z = (int)Math.Truncate((double)z / (double)z);
-            }
-            else if (a == 'z' && b == 'w')
-            {
-                if (w == 0) return;
-
-                z = (int)Math.Truncate((double)z / (double)w);
-            }
-            //w
-            else if (a == 'w' && b == 'x')
-            {
-                if (x == 0) return;
-
-                w = (int)Math.Truncate((double)w / (double)x);
-            }
-            else if (a == 'w' && b == 'y')
-            {
-                if (y == 0) return;
-
-                w = (int)Math.Truncate((double)w / (double)y);
-            }
-            else if (a == 'w' && b == 'z')
-            {
-                if (z == 0) return;
-
-                w = (int)Math.Truncate((double)w / (double)z);
-            }
-            else if (a == 'w' && b == 'w')
-            {
-                if (w == 0) return;
-
-                w = (int)Math.Truncate((double)w / (double)w);
-            }
-        }
+        a += b;
     }
 
 
 
-    private void Mod(char a, string bString, ref int x, ref int y, ref int z, ref int w)
+    private void Mul(ref int a, int b)
     {
-        if (int.TryParse(bString, out int result))
-        {
-            //5 % 3 = 2 because 3 fits in 5 once and whats left is the 2
-
-            //Make sure a < 0 and b <= 0 will not happen
-
-            if (result <= 0)
-            {
-                return;
-            }
-
-            if (a == 'x')
-            {
-                if (x < 0) return;
-            
-                x = x % result;
-            }
-            else if (a == 'y')
-            {
-                if (y < 0) return;
-
-                y = y % result;
-            }
-            else if (a == 'z')
-            {
-                if (z < 0) return;
-
-                z = z % result;
-            }
-            else if (a == 'w')
-            {
-                if (w < 0) return;
-
-                w = w % result;
-            }
-        }
-        else
-        {
-            char b = char.Parse(bString);
-
-            //x
-            if (a == 'x' && b == 'x')
-            {
-                if (x < 0 || x <= 0) return;
-            
-                x = x % x;
-            }
-            else if (a == 'x' && b == 'y')
-            {
-                if (x < 0 || y <= 0) return;
-
-                x = x % y;
-            }
-            else if (a == 'x' && b == 'z')
-            {
-                if (x < 0 || z <= 0) return;
-
-                x = x % z;
-            }
-            else if (a == 'x' && b == 'w')
-            {
-                if (x < 0 || w <= 0) return;
-
-                x = x % w;
-            }
-            //y
-            else if (a == 'y' && b == 'x')
-            {
-                if (y < 0 || x <= 0) return;
-
-                y = y % x;
-            }
-            else if (a == 'y' && b == 'y')
-            {
-                if (y < 0 || y <= 0) return;
-
-                y = y % y;
-            }
-            else if (a == 'y' && b == 'z')
-            {
-                if (y < 0 || z <= 0) return;
-
-                y = y % z;
-            }
-            else if (a == 'y' && b == 'w')
-            {
-                if (y < 0 || w <= 0) return;
-
-                y = y % w;
-            }
-            //z
-            else if (a == 'z' && b == 'x')
-            {
-                if (z < 0 || x <= 0) return;
-
-                z = z % x;
-            }
-            else if (a == 'z' && b == 'y')
-            {
-                if (z < 0 || y <= 0) return;
-
-                z = z % y;
-            }
-            else if (a == 'z' && b == 'z')
-            {
-                if (z < 0 || z <= 0) return;
-
-                z = z % z;
-            }
-            else if (a == 'z' && b == 'w')
-            {
-                if (z < 0 || w <= 0) return;
-
-                z = z % w;
-            }
-            //w
-            else if (a == 'w' && b == 'x')
-            {
-                if (w < 0 || x <= 0) return;
-
-                w = w % x;
-            }
-            else if (a == 'w' && b == 'y')
-            {
-                if (w < 0 || y <= 0) return;
-
-                w = w % y;
-            }
-            else if (a == 'w' && b == 'z')
-            {
-                if (w < 0 || z <= 0) return;
-
-                w = w % z;
-            }
-            else if (a == 'w' && b == 'w')
-            {
-                if (w < 0 || w <= 0) return;
-
-                w = w % w;
-            }
-        }
-        
+        a *= b;
     }
 
 
 
+    private void Div(ref int a, int b)
+    {
+        //Make sure no division by 0
+        if (b == 0)
+        {
+            return;
+        }
+
+        a = (int)Math.Truncate((double)a / (double)b);
+    }
+
+
+
+    private void Mod(ref int a, int b)
+    {
+        //5 % 3 = 2 because 3 fits in 5 once and whats left is the 2
+
+        //Make sure a < 0 and b <= 0 will not happen
+
+        if (a < 0 || b <= 0)
+        {
+            return;
+        }
+
+        a = a % b;
+    }
 }
 
