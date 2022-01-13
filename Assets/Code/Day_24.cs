@@ -158,7 +158,7 @@ public class Day_24 : MonoBehaviour
 
             for (int i = 0; i < modelNumberString.Length; i++)
             {
-                if (modelNumberString[i] == '0')
+                if (modelNumberString[i].Equals('0'))
                 {
                     modelNumber -= 1;
 
@@ -178,6 +178,7 @@ public class Day_24 : MonoBehaviour
             }
             
             //Cant be % 10 because 0 is not alloed wo will never happen
+            //This also makes it easier to stop Unity without ctrl-alt-del
             if (modelNumber % 1111111 == 0)
             {
                 Debug.Log(modelNumber);
