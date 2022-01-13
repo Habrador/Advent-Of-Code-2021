@@ -24,6 +24,11 @@ public class Day_24 : MonoBehaviour
         //Standardize instructions to speed up calculations
         List<Instruction> instructions = new List<Instruction>();
 
+        Wrapper xWrapper = new Wrapper();
+        Wrapper yWrapper = new Wrapper();
+        Wrapper zWrapper = new Wrapper();
+        Wrapper wWrapper = new Wrapper();
+
         foreach (string instructionString in allRowsString)
         {
             //Most are "add y w" but some are "inp w"
@@ -32,43 +37,101 @@ public class Day_24 : MonoBehaviour
 
             if (operation == "inp")
             {
-                instructions.Add(new Instruction(Operations.Inp, '0', "0"));
+                instructions.Add(new Instruction(Operations.Inp, wWrapper, null, 0));
             }
             else
             {
                 //"add y w" -> y 
                 char a = char.Parse(instructionString.Substring(4, 1));
 
+                Wrapper aWrapper = null;
+
+                if (a.Equals('x'))
+                {
+                    aWrapper = xWrapper;
+                }
+                else if (a.Equals('y'))
+                {
+                    aWrapper = yWrapper;
+                }
+                else if (a.Equals('z'))
+                {
+                    aWrapper = zWrapper;
+                }
+                else if (a.Equals('w'))
+                {
+                    aWrapper = wWrapper;
+                }
+
+
                 //b can be either variable or number
                 //"add y w" -> w 
-                string b = instructionString.Substring(6, 1);
+                string bString = instructionString.Substring(6, 1);
+
+                Wrapper bWrapper = null;
+                int bValue = -1;
+
+                if (int.TryParse(bString, out int result))
+                {
+                    bValue = result;
+                }
+                else
+                {
+                    char b = char.Parse(bString);
+
+                    if (b.Equals('x'))
+                    {
+                        bWrapper = xWrapper;
+                    }
+                    else if (b.Equals('y'))
+                    {
+                        bWrapper = yWrapper;
+                    }
+                    else if (b.Equals('z'))
+                    {
+                        bWrapper = zWrapper;
+                    }
+                    else if (b.Equals('w'))
+                    {
+                        bWrapper = wWrapper;
+                    }
+                }
 
                 if (operation == "add")
                 {
-                    instructions.Add(new Instruction(Operations.Add, a, b));
+                    instructions.Add(new Instruction(Operations.Add, aWrapper, bWrapper, bValue));
                 }
                 else if (operation == "mul")
                 {
-                    instructions.Add(new Instruction(Operations.Mul, a, b));
+                    instructions.Add(new Instruction(Operations.Mul, aWrapper, bWrapper, bValue));
                 }
                 else if (operation == "div")
                 {
-                    instructions.Add(new Instruction(Operations.Div, a, b));
+                    instructions.Add(new Instruction(Operations.Div, aWrapper, bWrapper, bValue));
                 }
                 else if (operation == "mod")
                 {
-                    instructions.Add(new Instruction(Operations.Mod, a, b));
+                    instructions.Add(new Instruction(Operations.Mod, aWrapper, bWrapper, bValue));
                 }
                 else if (operation == "eql")
                 {
-                    instructions.Add(new Instruction(Operations.Eql, a, b));
+                    instructions.Add(new Instruction(Operations.Eql, aWrapper, bWrapper, bValue));
                 }
             }
         }
 
+        //char test = 'x';
+
+        //Debug.Log(test.Equals('x'));
+
+        StartCoroutine(DoCalculations(instructions, xWrapper, yWrapper, zWrapper, wWrapper));
+        
+    }
 
 
 
+    private IEnumerator DoCalculations(List<Instruction> instructions, Wrapper xWrapper, Wrapper yWrapper, Wrapper zWrapper, Wrapper wWrapper)
+    {
         //Input is a 14 digit integer 1-9 where each integer is input to a calculation
 
         //We should find the largest valid model number, so start with max
@@ -84,12 +147,12 @@ public class Day_24 : MonoBehaviour
         {
             //safety += 1;
 
-            //if (safety > 1000)
+            //if (safety > 10000)
             //{
             //    break;
             //}
-        
-        
+
+
             //Check if this is a valid model number that doesnt include any zeros
             bool isModelNumberValid = true;
 
@@ -106,20 +169,31 @@ public class Day_24 : MonoBehaviour
                     break;
                 }
             }
-        
+
             if (!isModelNumberValid)
             {
+                //Debug.Log("Not valid");
+            
                 continue;
             }
-        
+            
+            //Cant be % 10 because 0 is not alloed wo will never happen
+            if (modelNumber % 1111111 == 0)
+            {
+                Debug.Log(modelNumber);
+
+                yield return null;
+            }
+
+
             //Pos in modelNumberString
             int calculationNumber = -1;
 
             //Integer variables start with 0
-            int x = 0;
-            int y = 0;
-            int z = 0;
-            int w = 0;
+            xWrapper.value = 0;
+            yWrapper.value = 0;
+            zWrapper.value = 0;
+            wWrapper.value = 0;
 
             foreach (Instruction instruction in instructions)
             {
@@ -127,20 +201,21 @@ public class Day_24 : MonoBehaviour
                 {
                     calculationNumber += 1;
 
-                    w = int.Parse(modelNumberString[calculationNumber].ToString());
+                    //Char to int
+                    wWrapper.value = modelNumberString[calculationNumber] - '0';
                 }
                 else
                 {
                     //Now we need to figure out if a, b are x, y, z, w
-                    Find_a_b_then_do_math(instruction.a, instruction.b, instruction.operation, ref x, ref y, ref z, ref w);
+                    DoMath(instruction);
                 }
             }
 
             //When the 14 calculations are finished, we check variable z. If z is 0, then the model number is valid, otherwise we try a new model
-            if (z == 0)
+            if (zWrapper.value == 0)
             {
                 Debug.Log($"The highest model number is: {modelNumber}");
-            
+
                 break;
             }
             else
@@ -152,6 +227,13 @@ public class Day_24 : MonoBehaviour
         }
     }
 
+
+    private class Wrapper
+    {
+        public int value = 0;
+    }
+
+
     private enum Operations 
     {
         Inp, Add, Mul, Div, Mod, Eql
@@ -161,185 +243,66 @@ public class Day_24 : MonoBehaviour
     {
         public Operations operation;
 
-        public char a;
-        public string b;
+        public Wrapper aWrapper;
+        public Wrapper bWrapper;
+        public int b;
 
-        public Instruction(Operations operation, char a, string b)
+        public Instruction(Operations operation, Wrapper aWrapper, Wrapper bWrapper, int b)
         {
             this.operation = operation;
-            this.a = a;
+            this.aWrapper = aWrapper;
+            this.bWrapper = bWrapper;
             this.b = b;
         }
     }
+    
 
 
-    //Combinations
-    //x x
-    //x y
-    //x z
-    //x w
-
-    //y x
-    //y y
-    //y z
-    //y w
-
-    //z x
-    //z y
-    //z z
-    //z w
-
-    //w x
-    //w y
-    //w z
-    //w w
-
-    //x number
-    //y number
-    //z number
-    //w number
-
-    private void Find_a_b_then_do_math(char a, string bString, Operations operation, ref int x, ref int y, ref int z, ref int w)
+    private void DoMath(Instruction instruction)
     {
-        if (int.TryParse(bString, out int result))
-        {
-            int b = result;
+        Wrapper aWrapper = instruction.aWrapper;
+    
+        int b = instruction.bWrapper == null ? instruction.b : instruction.bWrapper.value;
 
-            if (a == 'x')
-            {
-                DoMath(ref x, b, operation);
-            }
-            else if (a == 'y')
-            {
-                DoMath(ref y, b, operation);
-            }
-            else if (a == 'z')
-            {
-                DoMath(ref z, b, operation);
-            }
-            else if (a == 'w')
-            {
-                DoMath(ref w, b, operation);
-            }
+        if (instruction.operation == Operations.Add)
+        {
+            Add(aWrapper, b);
         }
-        else
+        else if (instruction.operation == Operations.Mul)
         {
-            char b = char.Parse(bString);
-
-            //x
-            if (a == 'x' && b == 'x')
-            {
-                DoMath(ref x, x, operation);
-            }
-            else if (a == 'x' && b == 'y')
-            {
-                DoMath(ref x, y, operation);
-            }
-            else if (a == 'x' && b == 'z')
-            {
-                DoMath(ref x, z, operation);
-            }
-            else if (a == 'x' && b == 'w')
-            {
-                DoMath(ref x, w, operation);
-            }
-            //y
-            else if (a == 'y' && b == 'x')
-            {
-                DoMath(ref y, x, operation);
-            }
-            else if (a == 'y' && b == 'y')
-            {
-                DoMath(ref y, y, operation);
-            }
-            else if (a == 'y' && b == 'z')
-            {
-                DoMath(ref y, z, operation);
-            }
-            else if (a == 'y' && b == 'w')
-            {
-                DoMath(ref y, w, operation);
-            }
-            //z
-            else if (a == 'z' && b == 'x')
-            {
-                DoMath(ref z, x, operation);
-            }
-            else if (a == 'z' && b == 'y')
-            {
-                DoMath(ref z, y, operation);
-            }
-            else if (a == 'z' && b == 'z')
-            {
-                DoMath(ref z, z, operation);
-            }
-            else if (a == 'z' && b == 'w')
-            {
-                DoMath(ref z, w, operation);
-            }
-            //w
-            else if (a == 'w' && b == 'x')
-            {
-                DoMath(ref w, x, operation);
-            }
-            else if (a == 'w' && b == 'y')
-            {
-                DoMath(ref w, y, operation);
-            }
-            else if (a == 'w' && b == 'z')
-            {
-                DoMath(ref w, z, operation);
-            }
-            else if (a == 'w' && b == 'w')
-            {
-                DoMath(ref w, w, operation);
-            }
+            Mul(aWrapper, b);
+        }
+        else if (instruction.operation == Operations.Div)
+        {
+            Div(aWrapper, b);
+        }
+        else if (instruction.operation == Operations.Mod)
+        {
+            Mod(aWrapper, b);
+        }
+        else if (instruction.operation == Operations.Eql)
+        {
+            Eql(aWrapper, b);
         }
     }
 
 
 
-    private void DoMath(ref int a, int b, Operations operation)
+    private void Add(Wrapper aWrapper, int b)
     {
-        if (operation == Operations.Add)
-        {
-            Add(ref a, b);
-        }
-        else if (operation == Operations.Mul)
-        {
-            Mul(ref a, b);
-        }
-        else if (operation == Operations.Div)
-        {
-            Div(ref a, b);
-        }
-        else if (operation == Operations.Mod)
-        {
-            Mod(ref a, b);
-        }
-        else if (operation == Operations.Eql)
-        {
-            Eql(ref a, b);
-        }
+        aWrapper.value += b;
     }
 
 
 
-    private void Add(ref int a, int b)
+    private void Mul(Wrapper aWrapper, int b)
     {
-        a += b;
+        aWrapper.value *= b;
     }
 
 
 
-    private void Mul(ref int a, int b)
-    {
-        a *= b;
-    }
-
-
-
-    private void Div(ref int a, int b)
+    private void Div(Wrapper aWrapper, int b)
     {
         //Make sure no division by 0
         if (b == 0)
@@ -347,36 +310,36 @@ public class Day_24 : MonoBehaviour
             return;
         }
 
-        a = (int)Math.Truncate((double)a / (double)b);
+        aWrapper.value = (int)Math.Truncate((double)aWrapper.value / (double)b);
     }
 
 
 
-    private void Mod(ref int a, int b)
+    private void Mod(Wrapper aWrapper, int b)
     {
         //5 % 3 = 2 because 3 fits in 5 once and whats left is the 2
 
         //Make sure a < 0 and b <= 0 will not happen
 
-        if (a < 0 || b <= 0)
+        if (aWrapper.value < 0 || b <= 0)
         {
             return;
         }
 
-        a = a % b;
+        aWrapper.value = aWrapper.value % b;
     }
 
 
 
-    private void Eql(ref int a, int b)
+    private void Eql(Wrapper aWrapper, int b)
     {
-        if (a == b)
+        if (aWrapper.value == b)
         {
-            a = 1;
+            aWrapper.value = 1;
         }
         else
         {
-            a = 0;
+            aWrapper.value = 0;
         }
     }
 }
