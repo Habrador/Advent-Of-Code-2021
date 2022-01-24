@@ -21,7 +21,7 @@ public class Day_24 : MonoBehaviour
         //Line after line of "add y w," etc
         //Consists of 14 calculations each starting with "inp w"
 
-        //To solve this problem you have to indentify a pattern like here: https://github.com/mattjlewis/AdventOfCode2021
+        //To solve this problem you have to indentify a pattern like here: https://github.com/mattjlewis/AdventOfCode2021 or here https://www.youtube.com/watch?v=Eswmo7Y7C4U
         //...or wait a bazillion time on the brute force solution! Or one could maybe try to use DOTS???
 
         //Optimization is the key so we have to hard code the instructions - not read them line by line

@@ -159,14 +159,15 @@ public class Day_21 : MonoBehaviour
 
 
 
-        //We need some kind of tree structure because using a recursive methods will not work because we want to generate all possible outcomes, not first possible best outcome.   
+        //We need some kind of tree structure because using a recursive methods will not work because we want to generate all possible outcomes, not first possible best outcome because then the number of universes counter will be wrong    
 
-        //Or if we know how many universes we for a player to win, such as 5, by using recursive, then we should be able to calculate how big the tree is if we know its depth is 5??? Or maybe that first solution is wrong and another part of the tree could have generated a better solution!
 
-        //We could also use a max-levels-expanded while keeping track of the min number of universes until we hit a goal
+
+        //So to solve this we have to use something called minimax and possibly alpha-beta pruning
+        
 
         //The dice is has 3 sides: 1, 2, 3
-        PlayGame(player_1_pos, player_2_pos, player_1_score, player_2_score);
+        //PlayGame(player_1_pos, player_2_pos, player_1_score, player_2_score);
 
 
 
