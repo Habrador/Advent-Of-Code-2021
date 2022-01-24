@@ -11,8 +11,71 @@ public class Day_24 : MonoBehaviour
         Part_1();    
     }
 
-    
-    
+    //All instructions look basically the same, so we should be able to simplify to speed up the bazilion of calculations
+    //mul x 0       //Always sets x to 0
+    //add x z       //x = z
+    //mod x 26      //I always 26 
+    //div z 1       //1 = dz
+    //add x 10      //10 = dx 
+    //eql x w
+    //eql x 0
+    //mul y 0       //Always sets y to 0
+    //add y 25      //Alays adds 25, so we might as well always set y to 25
+    //mul y x
+    //add y 1       //alays adds 1
+    //mul z y
+    //mul y 0       //Always sets y to 0
+    //add y w       //Always adds w to y, so we might as well set y to w
+    //add y 16      //16 = dy
+    //mul y x
+    //add z y
+
+    //mul x 0
+    //add x z
+    //mod x 26
+    //div z 26 //26 = dz
+    //add x -8 //-8 = dx
+    //eql x w
+    //eql x 0
+    //mul y 0
+    //add y 25 
+    //mul y x
+    //add y 1
+    //mul z y
+    //mul y 0
+    //add y w
+
+    //add y 10
+    //mul y x
+    //add z y
+
+    //Do x, y, z, w need to be long?
+    //x and y are always set to 0 in the instructions, so we dont need those as input
+    private void SimplifiedInstructions(ref int z, ref int w, int dx, int dy, int dz)
+    {
+        int x = z & 26 + dx;
+
+        if (dz != 0)
+        {
+            z = (int)Math.Truncate((double)z / (double)dz); //Or should it be floor?
+        }
+
+        //x = (x == w) ? 1 : 0;
+        //x = (x == 0) ? 1 : 0;
+        //Above can be simplified to
+        x = (x != w) ? 1 : 0;
+
+        int y = (25 * x) + 1;
+
+        z = z * y;
+
+        y = (w + dy) * x;
+
+        z = z + y;
+    }
+
+
+
     private void Part_1()
     {
         //Get the data 
@@ -71,10 +134,12 @@ public class Day_24 : MonoBehaviour
                 Wrapper bWrapper = null;
                 int bValue = -1;
 
+                //b is a number
                 if (int.TryParse(bString, out int result))
                 {
                     bValue = result;
                 }
+                //b is a variable
                 else
                 {
                     char b = char.Parse(bString);
@@ -198,16 +263,17 @@ public class Day_24 : MonoBehaviour
 
             foreach (Instruction instruction in instructions)
             {
+                //Inp means that we set w variable to a number
                 if (instruction.operation == Operations.Inp)
                 {
                     calculationNumber += 1;
 
-                    //Char to int
+                    //Char to int 
                     wWrapper.value = modelNumberString[calculationNumber] - '0';
                 }
+                //Otherwise we do some math instruction
                 else
                 {
-                    //Now we need to figure out if a, b are x, y, z, w
                     DoMath(instruction);
                 }
             }
@@ -342,6 +408,58 @@ public class Day_24 : MonoBehaviour
         {
             aWrapper.value = 0;
         }
+    }
+
+
+    //
+    // Integers
+    //
+    private void Add(ref int a, int b)
+    {
+        a += b;
+    }
+
+
+
+    private void Mul(ref int a, int b)
+    {
+        a *= b;
+    }
+
+
+
+    private void Div(ref int a, int b)
+    {
+        //Make sure no division by 0
+        if (b == 0)
+        {
+            return;
+        }
+
+        a = (int)Math.Truncate((double)a / (double)b);
+    }
+
+
+
+    private void Mod(ref int a, int b)
+    {
+        //5 % 3 = 2 because 3 fits in 5 once and whats left is the 2
+
+        //Make sure a < 0 and b <= 0 will not happen
+
+        if (a < 0 || b <= 0)
+        {
+            return;
+        }
+
+        a = a % b;
+    }
+
+
+
+    private void Eql(ref int a, int b)
+    {
+        a = (a == b) ? 1 : 0;
     }
 }
 
