@@ -21,6 +21,9 @@ public class Day_24 : MonoBehaviour
         //Line after line of "add y w," etc
         //Consists of 14 calculations each starting with "inp w"
 
+        //To solve this problem you have to indentify a pattern like here: https://github.com/mattjlewis/AdventOfCode2021
+        //...or wait a bazillion time on the brute force solution!
+
         //Optimization is the key so we have to hard code the instructions - not read them line by line
         int[] all_dz = new int[] { 1, 1, 1, 1, 1, 26, 1, 26, 26, 1, 26, 26, 26, 26};
         int[] all_dx = new int[] { 15, 10, 12, 10, 14, -11, 10, -16, -9, 11, -8, -8, -10, -9 };
