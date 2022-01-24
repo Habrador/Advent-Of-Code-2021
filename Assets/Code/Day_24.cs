@@ -22,7 +22,7 @@ public class Day_24 : MonoBehaviour
         //Consists of 14 calculations each starting with "inp w"
 
         //To solve this problem you have to indentify a pattern like here: https://github.com/mattjlewis/AdventOfCode2021
-        //...or wait a bazillion time on the brute force solution!
+        //...or wait a bazillion time on the brute force solution! Or one could maybe try to use DOTS???
 
         //Optimization is the key so we have to hard code the instructions - not read them line by line
         int[] all_dz = new int[] { 1, 1, 1, 1, 1, 26, 1, 26, 26, 1, 26, 26, 26, 26};
